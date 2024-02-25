@@ -1,2 +1,2 @@
-# Amazon_KDP_AI
-Amazon KDP AI For Creating Books
+# EnergiEase.ng Telegram Chatbot
+Buy Electricity Units In Nigeria using our Telegram Chatbot.
