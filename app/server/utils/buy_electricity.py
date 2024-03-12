@@ -12,13 +12,26 @@ print(credentials)
 
 # # Get Meter details
 # def get_meter_details():
-# return {
+#    return {
 #          "status_code":virtual_account['statusCode'],
 #          "message": virtual_account['message']
 #               }
 
 
-
+# {
+#     "status": "00",
+#     "message": "OK",
+#     "access_token": "240310367108",
+#     "customer": {
+#         "name": "BASHIRU SULEIMAN  ",
+#         "address": "PLATEAU STATE JOS BAUCHI BEHIND",
+#         "util": "Jos_Disco",
+#         "minimumAmount": "1000",
+#         "isMd": "no",
+#         "provider": "Jos_Disco"
+#     },
+#     "response_hash": "05e11dd40a23e64c1f370ff1545fd130dc3e6f29"
+# }
 
 # test = fintava.get_list_of_discos(
 #    credentials=credentials
@@ -32,5 +45,5 @@ print(credentials)
 #    plan_type="prepaid"
 # )
 
-# print(test_meter)
+# # print(test_meter)
 # print(test)

@@ -1,3 +1,5 @@
+import logging
+from datetime import datetime
 from telegram.ext import ContextTypes
 
 from telegram import (
@@ -15,6 +17,18 @@ from app.server.bot.message import *
 # Get Account Creation Modules and Electricity bills
 from app.server.utils.virtual_account import *
 from app.server.utils.buy_electricity import *
+
+# Database Modules
+from app.server.database.crud import *
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
 
 # Define chatbot states for conversation flow
 START_CHOICE, CHOOSE_DISTRO, COLLECT_METER_NUMBER, VERIFY_METER_NUMBER, CHOOSE_METER_TYPE, ELECTRICTY_AMOUNT, ORDER_CONFIRMATION, ACCOUNT_DETAILS, PAYMEMT_STATUS, UNIT_STATUS = range(10)
@@ -38,6 +52,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
    markup = InlineKeyboardMarkup(reply_keyboard)
    user = update.effective_user
    name = user.full_name
+   username = user.username
+   user_id = user.id
+   created_at = datetime.now()
+
+   # logger.info(f"{username}, {user_id}")
+   
+   # Create User Profile
+   try:
+      user_profile = await get_user_profile(user_id)
+      if user_profile and (user_profile['user_id'] == user_id):
+         user_profile = user_profile
+   except:
+      # Create User Profile
+      user_profile_data = {
+          "username":username,
+          "full_name": name,
+          "user_id": user_id,
+          "created_at": created_at
+      }
+      user_profile = await create_user_profile(user_profile_data)
+
    reply_message = welcome_menu(name)
    await context.bot.send_message(
       chat_id=update.effective_chat.id,

@@ -39,9 +39,16 @@ def create_account(name: str, amount:str):
          "message": virtual_account['message']
               }
 
-# test = create_account("musa", "1000")
+# test = create_account("musa", "200")
 # print(test)
 
-def verify_payment():
-   pass
-
+def verify_payment(response):
+   try:
+      if response['']:
+         pass
+      
+   except Exception:
+      return {
+         "status_code":virtual_account['statusCode'],
+         "message": virtual_account['message']
+              }

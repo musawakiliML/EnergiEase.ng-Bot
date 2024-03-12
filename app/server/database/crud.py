@@ -1,49 +1,48 @@
 from bson.objectid import ObjectId
 
-from app.server.models.chatbot_models import (
-    UserSchema,
+from app.server.schema.bot_model import (
     UserProfileSchema,
-    UserSessionSchema,
     OrdersSchema
     )
 
-from app.server.database.db_connection import (
-    user_sessions,
-    user_orders,
-    user_profiles,
-    users
+from app.server.database.config import (
+    energiease_user_profile,
+    energiease_user_order
     )
 
-from app.server.serializers.chatbot_serializers import (
-    user_session_serializer,
+from app.server.schema.serializers import (
     user_profile_serializer,
-    user_serializer,
     order_serializer
     )
 
-# get single session
+# Create order
 
-async def get_single_session(session_id: str):
-    # user_session = await user_sessions.find_one({"_id":ObjectId(id)})
-    user_session = await user_sessions.find_one({"session_id":session_id})
-    # print(user_session)
-    if user_session:
-        return user_session_serializer(user_session)
+async def create_order(user_order_data: dict):
+    order = await energiease_user_order.insert_one(user_order_data)
+    new_order = await energiease_user_order.find_one({"_id":order.inserted_id})
+    return order_serializer(new_order)
+
+
+# Get single order
+
+async def get_single_order(session_id: str):
+    user_order = await energiease_user_order.find_one({"session_id":session_id})
+    if user_order:
+        return order_serializer(user_order)
     else:
         return {"message":"not_found"}
 
-async def get_single_session_transaction(transaction_reference: str):
-    # user_session = await user_sessions.find_one({"_id":ObjectId(id)})
-    user_session = await user_sessions.find_one({"transaction_reference":transaction_reference})
-    # print(user_session)
-    if user_session:
-        return user_session_serializer(user_session)
+async def get_single_order_transaction(transaction_reference: str):
+    user_order = await energiease_user_order.find_one({"transaction_reference":transaction_reference})
+
+    if user_order:
+        return order_serializer(user_order)
     else:
         return {"message":"not_found"}
 
 # Add user session
 
-async def add_user_session(user_session_data: UserSessionSchema):
+async def add_user_session(user_session_data: UserProfileSchema):
     user_session_data = user_session_data.model_dump()
     # print(user_session_data)
     try:
@@ -54,9 +53,9 @@ async def add_user_session(user_session_data: UserSessionSchema):
     except Exception as e:
         print(f"Error in add_user_session: {str(e)}")
 
-# Update User session
+# Update User Order
 
-async def update_user_session(user_session_data: list, session_id: str):
+async def update_user_order(user_order_data: list, session_id: str):
     try:
 
         updated_user_session = await user_sessions.update_one({"session_id":session_id}, {"$set":{user_session_data[0]:user_session_data[1]}})
@@ -70,49 +69,19 @@ async def update_user_session(user_session_data: list, session_id: str):
     except Exception as e:
         print(f"Error in update_user_session: {str(e)}")
 
-# delete single session
-
-async def delete_single_session(session_id: str):
-    # user_session = await user_sessions.find_one({"_id":ObjectId(id)})
-    await user_sessions.delete_one({"session_id":session_id})
-    return {"Message":"Session Deleted Successfully!"}
-
-# Create user
-
-async def create_user(user_data: dict):
-    user = await users.insert_one(user_data)
-    new_user = await users.find_one({"_id":user.inserted_id})
-    return user_serializer(new_user)
-
-
-# Retrieve User
-
-async def get_user(session_id: str):
-    user = await users.find_one({"username":session_id})
-    if user:
-        return user_serializer(user)
-    # else:
-    #     return {"message":"not_found"}
-
 # Create user profile
 
 async def create_user_profile(user_profile_data: dict):
-    user_profile = await user_profiles.insert_one(user_profile_data)
-    new_user_profile = await user_profiles.find_one({"_id":user_profile.inserted_id})
+    user_profile = await energiease_user_profile.insert_one(user_profile_data)
+    new_user_profile = await energiease_user_profile.find_one({"_id":user_profile.inserted_id})
     return user_profile_serializer(new_user_profile)
 
-# get user Profile
+# Get user Profile
 
 async def get_user_profile(session_id: str):
-    user_profile = await user_profiles.find_one({"phone_id":session_id})
+    user_profile = await energiease_user_profile.find_one({"user_id":session_id})
+    
     if user_profile:
         return user_profile_serializer(user_profile)
     else:
-        return {"message":"not_found"}
-
-# Create order
-
-async def create_order(user_order_data: dict):
-    order = await user_orders.insert_one(user_order_data)
-    new_order = await user_orders.find_one({"_id":order.inserted_id})
-    return order_serializer(new_order)    
+        return {"message":"not_found"}  

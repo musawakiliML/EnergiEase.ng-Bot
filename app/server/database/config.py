@@ -27,4 +27,5 @@ database = client.energiease_bot
 
 # Database Collections
 
-energiease_bot_collection = database.get_collection("energiease_collection")
+energiease_user_profile = database.get_collection("energiease_user_profiles")
+energiease_user_order = database.get_collection("energiease_user_orders")
