@@ -1,6 +1,9 @@
-import requests
-import json
+'''Application Modules'''
 import os
+import json
+import time
+import requests
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,17 +21,19 @@ class GetBaseUrlAndApi:
       self.url_live = url_live
       self.key_live = key_live
    def urls(self):
-      if self.url_live == True:
+      '''Get Url Status'''
+      if self.url_live is True:
          return BASE_URL_LIVE
-      elif self.url_live == False:
+      elif self.url_live is False:
          return BASE_URL_STAGING
       else:
          return {"message": "Input True or False"}
    
    def keys(self):
-      if self.key_live == True:
+      '''Get Keys Status'''
+      if self.key_live is True:
          return FINTAVA_API_KEY_LIVE
-      elif self.key_live == False:
+      elif self.key_live is False:
          return FINTAVA_API_KEY_STAGING
       else:
          return {"message": "Input True or False"}
@@ -42,6 +47,7 @@ class FintavaCredentials:
       self.is_live = is_live
 
    def credentials(self):
+      '''Return Credentials as a Tuple'''
       data = (self.api_key, self.is_live)
       return data
 
@@ -59,10 +65,10 @@ class FintavaOperations:
       try:
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
          
          url = f"{base_url}/virtual-wallet/generate"
@@ -83,11 +89,11 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
+         response = requests.request('POST', url, headers=headers, data=json.dumps(payload), timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
-         raise {"message":str(e)}
+         return {"message":str(e)}
 
    # Get Virtual Account Details
    def get_virtual_account_details(self, credentials, wallet_id):
@@ -95,10 +101,10 @@ class FintavaOperations:
       try:
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
          
          url = f"{base_url}/virtual-wallet/{wallet_id}"
@@ -110,11 +116,11 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('GET', url, headers=headers)
+         response = requests.request('GET', url, headers=headers, timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
-         raise {"message":str(e)}
+         return {"message":str(e)}
       
    # Refresh Virtual Account
    def refresh_virtual_account(self, credentials, wallet_id):
@@ -133,9 +139,9 @@ class FintavaOperations:
             "accept": "application/json",
             "content-type": "application/json",
             "Authorization": f"Bearer {base_api_key}"
-         }  
-         
-         response = requests.request('PATCH', url, headers=headers)
+         }
+
+         response = requests.request('PATCH', url, headers=headers, timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
@@ -143,6 +149,7 @@ class FintavaOperations:
    
    # Get List of discos
    def get_list_of_discos(self, credentials):
+      '''Get list of discos'''
       try:
          live_status = credentials[1]
          api_key_status = credentials[0]
@@ -162,7 +169,7 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('GET', url, headers=headers)
+         response = requests.request('GET', url, headers=headers, timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
@@ -171,7 +178,7 @@ class FintavaOperations:
    
    # Preview Meter Details
    def preview_meter_details(self, credentials, meter_number, disco, plan_type):
-      try:
+      try:        
          live_status = credentials[1]
          api_key_status = credentials[0]
          if live_status == True or live_status == False:
@@ -194,7 +201,7 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
+         response = requests.request('POST', url, headers=headers, data=json.dumps(payload), timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
@@ -226,7 +233,7 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
+         response = requests.request('POST', url, headers=headers, data=json.dumps(payload), timeout=200)
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:

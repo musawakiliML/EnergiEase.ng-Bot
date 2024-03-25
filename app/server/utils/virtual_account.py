@@ -1,4 +1,6 @@
 from app.server.utils.api_config import *
+from app.server.utils.buy_electricity import buy_meter_unit
+from app.server.database.crud import get_single_order_transaction
 from uuid6 import uuid7
 
 fintava_credentials = FintavaCredentials(api_key=False, is_live=False)
@@ -39,16 +41,26 @@ def create_account(name: str, amount:str):
          "message": virtual_account['message']
               }
 
-# test = create_account("musa", "200")
-# print(test)
-
-def verify_payment(response):
+async def verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference):
+   '''Verify Payment to virtual account'''
    try:
-      if response['']:
-         pass
+      get_order_details = await get_single_order_transaction(transaction_reference)
+
+      if transaction_status is "PAID" and get_order_details['transaction_reference'] == transaction_reference:
+         # Buy Electricity unit
+         
+         buy_unit = buy_meter_unit(
+            meter_number=get_order_details["user_meter_number"],
+            meter_type=get_order_details["meter_type"],
+            disco=get_order_details["meter_code"],
+            amount=get_order_details["user_amount"]
+         )
+
+         if buy_unit["meter_token"]:
+            return buy_unit
       
    except Exception:
       return {
-         "status_code":virtual_account['statusCode'],
-         "message": virtual_account['message']
+         "status_code":buy_unit['statusCode'],
+         "message": buy_unit['message']
               }

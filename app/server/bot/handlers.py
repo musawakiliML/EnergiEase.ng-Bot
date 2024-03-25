@@ -1,4 +1,7 @@
+from dis import disco
 import logging
+from requests import session
+from uuid6 import uuid7
 from datetime import datetime
 from telegram.ext import ContextTypes
 
@@ -19,7 +22,13 @@ from app.server.utils.virtual_account import *
 from app.server.utils.buy_electricity import *
 
 # Database Modules
-from app.server.database.crud import *
+from app.server.database.crud import (
+   get_single_order,
+   create_order,
+   get_user_profile,
+   create_user_profile,
+   update_user_order
+)
 
 # Enable logging
 logging.basicConfig(
@@ -50,6 +59,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
          )
       ]]
    markup = InlineKeyboardMarkup(reply_keyboard)
+   
+   # Get user Details
    user = update.effective_user
    name = user.full_name
    username = user.username
@@ -57,21 +68,38 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
    created_at = datetime.now()
 
    # logger.info(f"{username}, {user_id}")
-   
+
    # Create User Profile
+   user_profile = await get_user_profile(user_id)
+   # logger.info(f"{user_profile}")
    try:
-      user_profile = await get_user_profile(user_id)
+      # Check if user profile exists
       if user_profile and (user_profile['user_id'] == user_id):
+         
          user_profile = user_profile
+
+         # logger.info(f"{user_profile}")
    except:
       # Create User Profile
       user_profile_data = {
-          "username":username,
-          "full_name": name,
-          "user_id": user_id,
-          "created_at": created_at
+         "username":username,
+         "full_name": name,
+         "user_id": user_id,
+         "created_at": created_at
       }
       user_profile = await create_user_profile(user_profile_data)
+   
+   # Create a new Order
+   session_id = str(uuid7()).split("-")[4]
+
+   user_order_data = {
+      "user_profile": user_profile,
+      "session_id": session_id
+   }
+
+   user_order_session = await create_order(user_order_data)
+
+   context.user_data["session_id"] = session_id
 
    reply_message = welcome_menu(name)
    await context.bot.send_message(
@@ -124,6 +152,11 @@ async def choose_distro(update: Update, context: CallbackContext) -> int:
    # save user input in context memory
    context.user_data["distribution_company"] = update.callback_query.data
 
+   # Save to database
+   session_id = context.user_data["session_id"]
+   user_order_data = ["meter_distribution", update.callback_query.data]
+   await update_user_order(user_order_data, session_id)
+
    await context.bot.send_message(
       chat_id=update.effective_chat.id,
       text=f"{meter_number_menu()}",
@@ -142,6 +175,11 @@ async def validate_meter_number(update: Update, context: ContextTypes.DEFAULT_TY
    
    # Save meter number
    context.user_data["meter_number"] = user_input
+
+   # Save to database
+   session_id = context.user_data["session_id"]
+   user_order_data = ["user_meter_number", user_input]
+   await update_user_order(user_order_data, session_id)
 
    reply_keyboard = [
         [
@@ -175,6 +213,57 @@ async def choose_meter_type(update: Update, context: CallbackContext) -> int:
    # save user meter type
    context.user_data["meter_type"] = update.callback_query.data
 
+   # Check Meter type and distro for equivalent data
+   if context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "prepaid":
+      meter_code = "AEDC"
+   elif context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "postpaid":
+      meter_code = "AEDC_Postpaid"
+   elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "prepaid":
+      meter_code = "Enugu_Electricity_Distribution_Prepaid"
+   elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "postpaid":
+      meter_code = "Enugu_Electricity_Distribution_Postpaid"
+   elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "prepaid":
+      meter_code = "Eko_Prepaid"
+   elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "postpaid":
+      meter_code = "Eko_Postpaid"
+   elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "prepaid":
+      meter_code = "Ibadan_Disco_Prepaid"
+   elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "postpaid":
+      meter_code = "Ibadan_Disco_Postpaid"
+   elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "prepaid":
+      meter_code = "Ikeja_Electric_Bill_Payment"
+   elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "postpaid":
+      meter_code = "Ikeja_Token_Purchase"
+   elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "prepaid":
+      meter_code = "Jos_Disco"
+   elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "postpaid":
+      meter_code = "Jos_Disco_Postpaid"
+   elif context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "prepaid":
+      meter_code = "AEDC"
+   elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "prepaid":
+      meter_code = "Kaduna_Electricity_Disco"
+   elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "postpaid":
+      meter_code = "Kaduna_Electricity_Disco_Postpaid"
+   elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "prepaid":
+      meter_code = "Kano_Electricity_Disco"
+   elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "postpaid":
+      meter_code = "Kano_Electricity_Disco_Postpaid"
+   elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "prepaid":
+      meter_code = "PhED_Electricity"
+   elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "postpaid":
+      meter_code = "PH_Disco"
+   elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "prepaid":
+      meter_code = "BEDC"
+   elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "postpaid":
+      meter_code = "BEDC_Postpaid"
+   
+   # Save to database
+   session_id = context.user_data["session_id"]
+   user_order_data = ["meter_type", update.callback_query.data]
+   user_meter_code = ["meter_code", meter_code]
+   await update_user_order(user_order_data, session_id)
+   await update_user_order(user_meter_code, session_id)
+
    reply_message = bill_amount_menu()
 
    await context.bot.send_message(
@@ -195,6 +284,11 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
 
       # Save Electricity Amount 
       context.user_data["electricity_amount"] = electricity_amount
+      
+      # Save to database
+      session_id = context.user_data["session_id"]
+      user_order_data = ["user_amount", electricity_amount]
+      await update_user_order(user_order_data, session_id)
 
       # Confirmation of the order
       reply_keyboard = [
@@ -210,12 +304,35 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
             ]
       ]
       markup = InlineKeyboardMarkup(reply_keyboard)
-      distro = context.user_data['distribution_company']
-      meter_number = context.user_data['meter_number']
-      meter_type = context.user_data['meter_type']
-      amount = context.user_data['electricity_amount']
-      meter_owner = "John Doe" # get from api call
-      meter_address = "No.1 Street One." # get from api call
+      # distro = context.user_data['distribution_company']
+      # meter_number = context.user_data['meter_number']
+      # meter_type = context.user_data['meter_type']
+      # amount = context.user_data['electricity_amount']
+
+      # Get user meter details from database
+      user_meter_info = await get_single_order(session_id)
+      distro_code = user_meter_info["meter_code"]
+      meter_number = user_meter_info["meter_number"]
+      meter_type = user_meter_info["meter_type"]
+
+
+      # Get meter details
+      user_meter_details = get_meter_details(
+         meter_number=meter_number,
+         meter_type=meter_type,
+         disco=distro_code
+      )
+
+      meter_owner = user_meter_details["meter_name"] # get from api call
+      meter_address = user_meter_details["meter_address"] # get from api call
+
+
+      session_id = context.user_data["sessiond_id"]
+      user_meter_name = ["meter_owner", meter_owner]
+      user_meter_address = ["meter_address", meter_address]
+
+      await update_user_order(user_meter_name, session_id)
+      await update_user_order(user_meter_address, session_id)
 
       reply_text = order_summary(
          meter_number=meter_number,
@@ -253,8 +370,11 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
       user = update.effective_user
       name = user.full_name
       
-      amount = context.user_data['electricity_amount']
+      session_id = context.user_data['session_id']
+      user_order_details = await get_single_order(session_id)
 
+      amount = user_order_details["user_amount"]
+      
       generate_virtual_account = create_account(
          name=name,
          amount=amount

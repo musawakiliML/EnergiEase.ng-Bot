@@ -1,5 +1,4 @@
-from app.server.utils.api_config import *
-from uuid6 import uuid7
+from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 
 fintava_credentials = FintavaCredentials(api_key=False, is_live=False)
 
@@ -7,43 +6,51 @@ credentials = fintava_credentials.credentials()
 
 fintava = FintavaOperations()
 
+# Get Meter details
+def get_meter_details(meter_number, disco, meter_type):
+   '''Get meter details'''
+   try:
+      meter_details = fintava.preview_meter_details(
+         credentials=credentials,
+         meter_number=meter_number,
+         disco=disco,
+         plan_type=meter_type
+         )
+      
+      if meter_details['status'] == "00":
+         user_meter_details = {
+            "meter_name": meter_details["customer"]["name"],
+            "meter_address": meter_details["customer"]["address"]
+         }
+         
+         return user_meter_details
+   except Exception:
+      return {
+         "status_code":meter_details['statusCode'],
+         "message": meter_details['message']
+              }
 
-print(credentials)
+# Buy Meter Unit
+def buy_meter_unit(meter_number, disco, amount, meter_type):
+   '''Buy Meter units'''
+   try:
+      user_meter_unit = fintava.buy_electricity_units(
+         credentials=credentials,
+         meter_number=meter_number,
+         disco=disco,
+         plan_type=meter_type,
+         amount=amount
+      )
 
-# # Get Meter details
-# def get_meter_details():
-#    return {
-#          "status_code":virtual_account['statusCode'],
-#          "message": virtual_account['message']
-#               }
+      if user_meter_unit["status"] == 200:
+         user_meter_unit_details = {
+            "meter_token": user_meter_unit["meter_token"],
+            "meter_units": user_meter_unit["units"]
+         }
 
-
-# {
-#     "status": "00",
-#     "message": "OK",
-#     "access_token": "240310367108",
-#     "customer": {
-#         "name": "BASHIRU SULEIMAN  ",
-#         "address": "PLATEAU STATE JOS BAUCHI BEHIND",
-#         "util": "Jos_Disco",
-#         "minimumAmount": "1000",
-#         "isMd": "no",
-#         "provider": "Jos_Disco"
-#     },
-#     "response_hash": "05e11dd40a23e64c1f370ff1545fd130dc3e6f29"
-# }
-
-# test = fintava.get_list_of_discos(
-#    credentials=credentials
-#    )
-
-
-# test_meter = fintava.preview_meter_details(
-#    credentials=credentials,
-#    meter_number="0150000896855",
-#    disco="Jos_Disco",
-#    plan_type="prepaid"
-# )
-
-# # print(test_meter)
-# print(test)
+         return user_meter_unit_details
+   except Exception:
+      return {
+            "status_code":user_meter_unit['statusCode'],
+            "message": user_meter_unit['message']
+               }
