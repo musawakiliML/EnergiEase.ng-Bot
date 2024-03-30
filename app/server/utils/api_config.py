@@ -194,10 +194,10 @@ class FintavaOperations:
          
          if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
-            # logger.info(f"{base_url}")
+            logger.info(f"{base_url}")
          if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
-            # logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
+            logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
          
          
          url = f"{base_url}/billing/preview-meter"
