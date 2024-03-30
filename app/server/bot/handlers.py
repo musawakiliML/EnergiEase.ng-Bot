@@ -339,7 +339,7 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
          disco=distro_code
       )
       # logger.info(f"{user_meter_details}")
-      if user_meter_details["status"] == "00":
+      if user_meter_details["status"] == "200":
          meter_owner = user_meter_details["meter_name"] # get from api call
          meter_address = user_meter_details["meter_address"] # get from api call
       else:

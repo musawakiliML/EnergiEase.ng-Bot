@@ -1,4 +1,3 @@
-from doctest import REPORT_CDIFF
 from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 
 fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
