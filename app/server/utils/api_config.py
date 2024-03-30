@@ -2,8 +2,18 @@
 import os
 import json
 import requests
+import logging
 
 from dotenv import load_dotenv
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -185,6 +195,8 @@ class FintavaOperations:
          
          if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
+
+         logger.info(f"{base_url} {base_api_key}")
          
          url = f"{base_url}/billing/preview-meter"
 
@@ -202,6 +214,7 @@ class FintavaOperations:
          
          response = requests.request('POST', url, headers=headers, data=json.dumps(payload), timeout=200)
          response_dict = json.loads(response.text)
+         logger.info(f"{response_dict}")
          return response_dict
       except Exception as e:
          return {"message":str(e)}
