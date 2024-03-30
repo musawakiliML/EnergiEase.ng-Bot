@@ -16,7 +16,7 @@ def get_meter_details(meter_number, disco, meter_type):
          disco=disco,
          plan_type=meter_type
          )
-      print(meter_details)
+      # print(meter_details)
       response = meter_details.get("status", 400)
       if response == "00":
          user_meter_detail = {
