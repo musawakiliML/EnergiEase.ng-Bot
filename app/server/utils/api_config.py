@@ -126,10 +126,10 @@ class FintavaOperations:
       try:   
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
          
          url = f"{base_url}/virtual-wallet/{wallet_id}/refresh"
@@ -152,10 +152,10 @@ class FintavaOperations:
       try:
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
 
          # print(base_api_key)
@@ -180,10 +180,10 @@ class FintavaOperations:
       try:        
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
          
          url = f"{base_url}/billing/preview-meter"
@@ -211,10 +211,10 @@ class FintavaOperations:
       try:
          live_status = credentials[1]
          api_key_status = credentials[0]
-         if live_status == True or live_status == False:
+         if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
          
-         if api_key_status == True or api_key_status == False:
+         if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
          
          url = f"{base_url}/billing/electricity"

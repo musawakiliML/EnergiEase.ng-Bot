@@ -9,7 +9,7 @@ from telegram import Bot
 
 from app.server.bot.message import order_confirmation_message, order_failed, order_successful
 
-fintava_credentials = FintavaCredentials(api_key=False, is_live=False)
+fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 
 credentials = fintava_credentials.credentials()
 
