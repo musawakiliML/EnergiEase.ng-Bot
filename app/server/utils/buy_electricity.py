@@ -1,3 +1,4 @@
+import logging
 from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 
 fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
@@ -5,6 +6,15 @@ fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 credentials = fintava_credentials.credentials()
 
 fintava = FintavaOperations()
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
 
 # Get Meter details
 def get_meter_details(meter_number, disco, meter_type):
@@ -16,8 +26,9 @@ def get_meter_details(meter_number, disco, meter_type):
          disco=disco,
          plan_type=meter_type
          )
-      # print(meter_details)
+      logger.info(f"{meter_details}")
       response = meter_details.get("status", 400)
+      logger.info(f"{response}")
       if response == "00":
          user_meter_detail = {
             "meter_name": meter_details["customer"]["name"],
