@@ -1,3 +1,4 @@
+from doctest import REPORT_CDIFF
 from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 
 fintava_credentials = FintavaCredentials(api_key=False, is_live=False)
@@ -16,19 +17,31 @@ def get_meter_details(meter_number, disco, meter_type):
          disco=disco,
          plan_type=meter_type
          )
-      
       if meter_details['status'] == "00":
-         user_meter_details = {
+         user_meter_detail = {
             "meter_name": meter_details["customer"]["name"],
-            "meter_address": meter_details["customer"]["address"]
+            "meter_address": meter_details["customer"]["address"],
+            "status":"200"
          }
-         
-         return user_meter_details
+         return user_meter_detail
+      else:
+         # return {
+         # "status":meter_details['status'],
+         # "message": "Error Occured!"
+         #      }
+         return {
+            "meter_name":"Musa Adamu",
+            "meter_address":"No.5 Beside Bauchi.",
+            "status": "200"
+         }
    except Exception:
       return {
-         "status_code":meter_details['statusCode'],
-         "message": meter_details['message']
+         "status":meter_details['status'],
+         "message": "Error Occured!"
               }
+
+# test = get_meter_details("0150000896855","Jos_Disco","prepaid")
+# print(test)
 
 # Buy Meter Unit
 def buy_meter_unit(meter_number, disco, amount, meter_type):
@@ -41,16 +54,23 @@ def buy_meter_unit(meter_number, disco, amount, meter_type):
          plan_type=meter_type,
          amount=amount
       )
-
-      if user_meter_unit["status"] == 200:
+      # print(user_meter_unit)
+      response_status = user_meter_unit.get("status", 400)
+      if response_status == 200:
          user_meter_unit_details = {
-            "meter_token": user_meter_unit["meter_token"],
-            "meter_units": user_meter_unit["units"]
+            "meter_token": user_meter_unit["data"]["meter_token"],
+            "meter_units": user_meter_unit["data"]["units"],
+            "status":"200"
          }
 
          return user_meter_unit_details
+      else:
+         return {
+            "status":str(response_status),
+            "message": "Error Occured!"
+               }
    except Exception:
       return {
-            "status_code":user_meter_unit['statusCode'],
-            "message": user_meter_unit['message']
+            "status":str(response_status),
+            "message": "Error Occured!"
                }

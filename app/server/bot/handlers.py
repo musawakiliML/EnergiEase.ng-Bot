@@ -1,6 +1,4 @@
-from dis import disco
 import logging
-from requests import session
 from uuid6 import uuid7
 from datetime import datetime
 from telegram.ext import ContextTypes
@@ -91,10 +89,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
    
    # Create a new Order
    session_id = str(uuid7()).split("-")[4]
+   created_at = datetime.utcnow()
 
    user_order_data = {
       "user_profile": user_profile,
-      "session_id": session_id
+      "session_id": session_id,
+      "meter_distribution": "",
+      "user_meter_number": "",
+      "meter_owner": "",
+      "meter_address": "",
+      "user_amount": "",
+      "meter_type": "",
+      "meter_code":"",
+      "token": "",
+      "units": "",
+      "payment_confirmation": "",
+      "unit_confirmation": "",
+      "transaction_id": "",
+      "order_status": "",
+      "transaction_reference": "",
+      "created_at": created_at
    }
 
    user_order_session = await create_order(user_order_data)
@@ -102,6 +116,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
    context.user_data["session_id"] = session_id
 
    reply_message = welcome_menu(name)
+   logger.info(f"{update.effective_chat.id}")
    await context.bot.send_message(
       chat_id=update.effective_chat.id,
       text=reply_message,
@@ -312,8 +327,9 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
       # Get user meter details from database
       user_meter_info = await get_single_order(session_id)
       distro_code = user_meter_info["meter_code"]
-      meter_number = user_meter_info["meter_number"]
+      meter_number = user_meter_info["user_meter_number"]
       meter_type = user_meter_info["meter_type"]
+      amount = user_meter_info["user_amount"]
 
 
       # Get meter details
@@ -322,12 +338,18 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
          meter_type=meter_type,
          disco=distro_code
       )
+      # logger.info(f"{user_meter_details}")
+      if user_meter_details["status"] == "200":
+         meter_owner = user_meter_details["meter_name"] # get from api call
+         meter_address = user_meter_details["meter_address"] # get from api call
+      else:
+         await context.bot.send_message(
+         chat_id=update.effective_chat.id,
+         text=order_failed(user_meter_info["_id"])
+      )
+         return ConversationHandler.END
 
-      meter_owner = user_meter_details["meter_name"] # get from api call
-      meter_address = user_meter_details["meter_address"] # get from api call
-
-
-      session_id = context.user_data["sessiond_id"]
+      session_id = context.user_data["session_id"]
       user_meter_name = ["meter_owner", meter_owner]
       user_meter_address = ["meter_address", meter_address]
 
@@ -382,49 +404,17 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
       account_number = generate_virtual_account['Account Number']
       account_name = generate_virtual_account['Account Name']
       bank_name = generate_virtual_account['Bank']
+      transaction_id = generate_virtual_account["ID"]
+      payment_status = generate_virtual_account["Payment Status"]
 
-      account_details = order_payment(amount, account_number, account_name, bank_name)
+      account_details = order_payment(amount, int(account_number), account_name, bank_name)
 
       await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details)
 
-      # Perform API calls and confirm payment
+      await update_user_order(["transaction_id", transaction_id], session_id)
+      await update_user_order(["payment_confirmation", payment_status], session_id)
       
-      payment_status="successful"
-      if payment_status == "successful":
-         reply_text = order_confirmation_message(order_id="1123-1234-1243")
-         
-         await context.bot.send_message(chat_id=update.effective_chat.id, text=reply_text)
-
-         # Generate unit tokens
-         meter_number = "1233445554"
-         meter_units = "12.8"
-         token_status = "successful"
-         meter_token = "889909877665444"
-         if token_status == "successful":
-            reply_text = order_successful(
-               meter_number=meter_number,
-               meter_token=meter_token,
-               meter_unit=meter_units)
-            
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=reply_text)
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=quit_chat())
-            
-            # End conversation and close chat session
-            return ConversationHandler.END
-         
-         else:
-            reply_text = order_failed(order_id="1123-1222-1123")
-            
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=reply_text)
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=quit_chat())
-
-            return ConversationHandler.END
-         
-      else: 
-         reply_text = order_failed(order_id="1123-1222-1123")
-         await context.bot.send_message(chat_id=update.effective_chat.id, text=reply_text)
-         await context.bot.send_message(chat_id=update.effective_chat.id, text=quit_chat())
-         return ConversationHandler.END
+      return ConversationHandler.END
       
 
 # Customer Support

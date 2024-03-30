@@ -41,7 +41,7 @@ async def get_single_order_transaction(transaction_reference: str):
     else:
         return {"message":"not_found"}
 
-# Update User Order
+# Update User Order During Session
 
 async def update_user_order(user_order_data: list, session_id: str):
     '''Update Single User Order'''
@@ -56,6 +56,20 @@ async def update_user_order(user_order_data: list, session_id: str):
     except Exception as e:
         return {"Error in update_user_session": str(e)}
 
+# Update User Order During transfer
+
+async def update_user_order_transaction(user_order_data: list, transaction_id: str):
+    '''Update Single User Order'''
+    try:
+        update_user_order = await energiease_user_order.update_one({"transaction_id":transaction_id}, {"$set":{user_order_data[0]:user_order_data[1]}})
+        updated_user_order = await energiease_user_order.find_one({"transaction_id":transaction_id})
+
+        if updated_user_order:
+            return order_serializer(updated_user_order)
+        else:
+            return {"Message":f'No post with this id: {id} found'}
+    except Exception as e:
+        return {"Error in update_user_session": str(e)}
 
 
 # ================ User Profile ================= #

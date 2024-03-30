@@ -45,7 +45,8 @@ logger = logging.getLogger(__name__)
 WEBHOOK_PATH = "/telegram"
 
 # URL of your FastAPI server
-WEBHOOK_URL = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
+WEBHOOK_URL_STAGING = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
+WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot.onrender.com" + WEBHOOK_PATH
 
 
 

@@ -13,20 +13,21 @@ class UserProfileSchema(BaseModel):
 class OrdersSchema(BaseModel):
     '''Creating an Order Model'''
     # id: str = Field(..., alias="_id")
+    # List[Optional[str]] = [None]
+    # Union[str, None]
     user_profile: UserProfileSchema
-    session_id: List[Optional[str]] = [None]
-    meter_distribution: List[Optional[str]] = [None]
-    user_meter_number: List[Optional[str]] = [None]
-    meter_owner: List[Optional[str]] = [None]
-    meter_address: List[Optional[str]] = [None]
-    user_amount: List[Optional[str]] = [None]
-    meter_type: List[Optional[str]] = [None]
-    meter_code: List[Optional[str]] = [None]
-    payment_confirmation: List[Optional[str]] = [None]
-    unit_confirmation: List[Optional[str]] = [None]
-    token: List[Optional[str]] = [None]
-    units: List[Optional[str]] = [None]
-    transaction_id: List[Optional[str]] = [None]
-    transaction_reference: List[Optional[str]] = [None]
-    order_status: List[Optional[str]] = [None]
+    session_id: str | None
+    meter_distribution: str | None
+    user_meter_number: str | None
+    user_meter_number: str | None
+    user_amount: str | None
+    meter_type: str | None
+    meter_code: str | None
+    payment_confirmation: str | None
+    unit_confirmation: str | None
+    token: str | None
+    units: str | None
+    transaction_id: str | None
+    transaction_reference: str | None
+    order_status: str | None
     created_at: Union[datetime, None] = None

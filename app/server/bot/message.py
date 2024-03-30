@@ -30,22 +30,22 @@ def order_summary(owner: str, amount: str, meter_number: str, package: str, addr
     return message
 
 def order_payment(amount: str, account_number: int, account_name: str, bank_name: str):
-    message = f"Fabulous!! Please send 💵 {amount} to:\n\n\tAccount number: {account_number}\n\tAccount name: {account_name}\n\tBank name: {bank_name}\n\n ⌛ Your request would be processed automatically once we received your payment."
+    message = f"Fabulous!! Please send 💵 {amount} to:\n\n\tAccount number: {account_number}\n\tAccount name: {account_name}\n\tBank name: {bank_name}\n\n\tAccountNumber Expires In: 30mins\n\n ⌛ Your request would be processed automatically once we received your payment."
 
     return message
 
 def order_confirmation_message(order_id: str):
-    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id:*{order_id}*\n⌛ We are processing it."
+    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id: {order_id}\n⌛ We are processing it."
 
     return message
 
 def order_successful(meter_unit: str, meter_number: str, meter_token: str):
-    message = f"Your Order was successful!! 🎉\n You can get the details below:\n\n\tToken: *{meter_token}*\n\tUnits: *{meter_unit}*\n\tMeter Number: {meter_number}\n\nThank you for choosing EnergiEase!🤗"
+    message = f"Your Order was successful!! 🎉\n You can get the details below:\n\n\tToken: {meter_token}\n\tUnits: {meter_unit}\n\tMeter Number: {meter_number}\n\nThank you for choosing EnergiEase!🤗"
 
     return message
 
 def order_failed(order_id: str):
-    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support through email with your Order Id:*{order_id}*. support@energieasebot.ng"
+    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support with your Order Id:{order_id}, or send email to support@energieasebot.ng."
     return message
 
 def customer_support():
