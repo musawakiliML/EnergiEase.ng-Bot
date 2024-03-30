@@ -90,7 +90,7 @@ application.add_handler(cancel_command)
 # Set up the webhook
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await application.bot.set_webhook(WEBHOOK_URL, allowed_updates=Update.ALL_TYPES)
+    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
     async with application:
         await application.start()
         yield
