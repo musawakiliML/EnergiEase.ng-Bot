@@ -21,7 +21,7 @@ BASE_URL_STAGING = os.environ["BASE_URL_STAGING"]
 BASE_URL_LIVE = os.environ["BASE_URL_LIVE"]
 FINTAVA_API_KEY_STAGING = os.environ["FINTAVA_API_KEY_STAGING"]
 FINTAVA_API_KEY = os.environ["FINTAVA_API_KEY"]
-
+logger.info(f"Key: {FINTAVA_API_KEY}")
 
 # API BASE URL CLass
 class GetBaseUrlAndApi:
