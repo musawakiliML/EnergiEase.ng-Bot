@@ -184,7 +184,7 @@ async def validate_meter_number(update: Update, context: ContextTypes.DEFAULT_TY
    user_input = update.message.text.strip()
 
    if not user_input.isdigit() or len(user_input) != 13:
-      await update.message.reply_text("Invalid meter number. Please enter a 11-digit number.")
+      await update.message.reply_text("Invalid meter number. Please enter a 13-digit number.")
       
       return COLLECT_METER_NUMBER
    

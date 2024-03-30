@@ -30,7 +30,7 @@ def create_account(name: str, amount:str):
          customer_name=name,
          phone="+2348135810804",
          email="musaadamuw@gmail.com",
-         expire_time=15,
+         expire_time=30,
          merchant_reference=str(uuid7()).split("-")[4],
          description="Electricity Purchase",
          amount=amount,
