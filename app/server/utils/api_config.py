@@ -20,7 +20,8 @@ load_dotenv()
 BASE_URL_STAGING = os.environ["BASE_URL_STAGING"]
 BASE_URL_LIVE = os.environ["BASE_URL_LIVE"]
 FINTAVA_API_KEY_STAGING = os.environ["FINTAVA_API_KEY_STAGING"]
-FINTAVA_API_KEY_LIVE = os.environ["FINTAVA_API_KEY_LIVE"]
+FINTAVA_API_KEY = os.environ["FINTAVA_API_KEY"]
+
 
 # API BASE URL CLass
 class GetBaseUrlAndApi:
@@ -41,7 +42,7 @@ class GetBaseUrlAndApi:
    def keys(self):
       '''Get Keys Status'''
       if self.key_live is True:
-         return FINTAVA_API_KEY_LIVE
+         return FINTAVA_API_KEY
       elif self.key_live is False:
          return FINTAVA_API_KEY_STAGING
       else:
@@ -190,13 +191,14 @@ class FintavaOperations:
       try:        
          live_status = credentials[1]
          api_key_status = credentials[0]
+         
          if live_status is True or live_status is False:
             base_url = GetBaseUrlAndApi(live_status, api_key_status).urls()
-         
+            # logger.info(f"{base_url}")
          if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
-
-         logger.info(f"{base_url} {base_api_key}")
+            # logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
+         
          
          url = f"{base_url}/billing/preview-meter"
 
@@ -212,9 +214,9 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }  
          
-         response = requests.request('POST', url, headers=headers, data=json.dumps(payload), timeout=200)
+         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
          response_dict = json.loads(response.text)
-         logger.info(f"{response_dict}")
+         # logger.info(f"{response_dict}")
          return response_dict
       except Exception as e:
          return {"message":str(e)}
