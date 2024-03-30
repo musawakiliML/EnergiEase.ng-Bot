@@ -26,7 +26,7 @@ def get_meter_details(meter_number, disco, meter_type):
          disco=disco,
          plan_type=meter_type
          )
-      logger.info(f"{meter_details}")
+      # logger.info(f"{meter_details}")
       response = meter_details.get("status", 400)
       # logger.info(f"{response}")
       if response == "00":
