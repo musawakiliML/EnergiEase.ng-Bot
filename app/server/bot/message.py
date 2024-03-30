@@ -30,7 +30,7 @@ def order_summary(owner: str, amount: str, meter_number: str, package: str, addr
     return message
 
 def order_payment(amount: str, account_number: int, account_name: str, bank_name: str):
-    message = f"Fabulous!! Please send 💵 {amount} to:\n\n\tAccount number: {account_number}\n\tAccount name: {account_name}\n\tBank name: {bank_name}\n\n\tAccountNumber Expires In: 30mins\n\n ⌛ Your request would be processed automatically once we received your payment."
+    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number: {account_number}\n\tAccount name: {account_name}\n\tBank name: {bank_name}\n\n\tAccountNumber Expires In: 30mins\n\n ⌛ Your request would be processed automatically once we received your payment."
 
     return message
 
