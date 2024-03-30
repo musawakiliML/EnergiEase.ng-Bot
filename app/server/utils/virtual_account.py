@@ -39,7 +39,7 @@ def create_account(name: str, amount:str):
          account_details = {
             "Account Name": virtual_account['data']['virtualAcctName'],
             "Merchant Ref": virtual_account['data']['merchantReference'],
-            "Account Number": int(virtual_account['data']['virtualAcctNo']),
+            "Account Number": virtual_account['data']['virtualAcctNo'],
             "Bank": virtual_account['data']['bank'],
             "ID": virtual_account['data']['id'],
             "Payment Status": virtual_account['data']['paymentStatus'],

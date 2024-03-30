@@ -407,7 +407,7 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
       transaction_id = generate_virtual_account["ID"]
       payment_status = generate_virtual_account["Payment Status"]
 
-      account_details = order_payment(amount, int(account_number), account_name, bank_name)
+      account_details = order_payment(amount, account_number, account_name, bank_name)
 
       await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details)
 
