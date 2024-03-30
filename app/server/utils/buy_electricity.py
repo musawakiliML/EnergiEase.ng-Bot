@@ -17,7 +17,8 @@ def get_meter_details(meter_number, disco, meter_type):
          disco=disco,
          plan_type=meter_type
          )
-      if meter_details['status'] == "00":
+      response = meter_details.get("status", 400)
+      if response == "00":
          user_meter_detail = {
             "meter_name": meter_details["customer"]["name"],
             "meter_address": meter_details["customer"]["address"],
@@ -26,7 +27,7 @@ def get_meter_details(meter_number, disco, meter_type):
          return user_meter_detail
       else:
          return {
-         "status":meter_details['status'],
+         "status":str(response),
          "message": "Error Occured!"
               }
          # return {
