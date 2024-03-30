@@ -25,15 +25,15 @@ def get_meter_details(meter_number, disco, meter_type):
          }
          return user_meter_detail
       else:
-         # return {
-         # "status":meter_details['status'],
-         # "message": "Error Occured!"
-         #      }
          return {
-            "meter_name":"Musa Adamu",
-            "meter_address":"No.5 Beside Bauchi.",
-            "status": "200"
-         }
+         "status":meter_details['status'],
+         "message": "Error Occured!"
+              }
+         # return {
+         #    "meter_name":"Musa Adamu",
+         #    "meter_address":"No.5 Beside Bauchi.",
+         #    "status": "200"
+         # }
    except Exception:
       return {
          "status":meter_details['status'],
