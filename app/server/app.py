@@ -128,4 +128,4 @@ async def receive_update(request: Request):
 
 @app.get("/api")
 async def start_bot():
-    return {"message":f"Welcome to EnergiEase: Your Journey to Smarter Energy Choices{TELEGRAM_BOT_TOKEN}"}
+    return {"message":f"Welcome to EnergiEase: Your Journey to Smarter Energy Choices"}
