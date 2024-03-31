@@ -197,7 +197,7 @@ class FintavaOperations:
             # logger.info(f"{base_url}")
          if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
-            # logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
+            logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
          
          
          url = f"{base_url}/billing/preview-meter"
@@ -212,7 +212,7 @@ class FintavaOperations:
             "accept": "application/json",
             "content-type": "application/json",
             "Authorization": f"Bearer {base_api_key}"
-         }  
+         }
          
          response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
          response_dict = json.loads(response.text)
