@@ -197,7 +197,7 @@ class FintavaOperations:
             # logger.info(f"{base_url}")
          if api_key_status is True or api_key_status is False:
             base_api_key = GetBaseUrlAndApi(live_status, api_key_status).keys()
-            # logger.info(f"{GetBaseUrlAndApi(live_status, api_key_status).keys()}")
+            logger.info(f"{base_api_key}")
          
          
          url = f"{base_url}/billing/preview-meter"
@@ -213,12 +213,13 @@ class FintavaOperations:
             "content-type": "application/json",
             "Authorization": f"Bearer {base_api_key}"
          }
-         logger.info(f"{json.dumps(payload)}")
-         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
-         # logger.info(f"{json.loads(response.text)}")
+         # logger.info(f"{json.dumps(payload)}")
+         response = requests.request('POST', url, headers=headers, data=payload)
+         logger.info(f"{response.json()}")
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
+         logger.info(f"{Exception}")
          return {"message":str(e)}
       
    # Buy Electricity Units
