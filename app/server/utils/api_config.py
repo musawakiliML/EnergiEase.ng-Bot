@@ -215,8 +215,8 @@ class FintavaOperations:
          }
          
          response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
+         logger.info(f"{response.text}")
          response_dict = json.loads(response.text)
-         logger.info(f"{response_dict}")
          return response_dict
       except Exception as e:
          return {"message":str(e)}
