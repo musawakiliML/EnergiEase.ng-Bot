@@ -48,6 +48,8 @@ WEBHOOK_PATH = "/telegram"
 WEBHOOK_URL_STAGING = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
 WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot.onrender.com" + WEBHOOK_PATH
 
+WEBHOOK_URL_PRODUCTION_VERCEL = "https://energi-ease-ng-bot.vercel.app" + WEBHOOK_PATH
+
 
 
 # Configuring the Main Bot Instance
@@ -90,7 +92,7 @@ application.add_handler(cancel_command)
 # Set up the webhook
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION_VERCEL, allowed_updates=Update.ALL_TYPES)
     async with application:
         await application.start()
         yield
