@@ -214,8 +214,9 @@ class FintavaOperations:
             "Authorization": f"Bearer {base_api_key}"
          }
          # logger.info(f"{json.dumps(payload)}")
-         response = requests.request('POST', url, headers=headers, data=payload)
-         logger.info(f"{response.json()}")
+         response = requests.request('POST', url, headers=headers, data=json.dumps(payload))
+         # logger.info(f"{response.json()}")
+         logger.info(f"Passed here!!")
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
