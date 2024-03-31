@@ -8,5 +8,8 @@
    ],
    "env": {
      "APP_MODULE": "app.server.app:app"
-   }
+   },
+    "engines": {
+      "node": "18.x"
+  }
  }
