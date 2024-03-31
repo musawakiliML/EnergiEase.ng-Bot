@@ -220,7 +220,7 @@ class FintavaOperations:
          response_dict = json.loads(response.text)
          return response_dict
       except Exception as e:
-         logger.info(f"{Exception}")
+         logger.info(f"{e}")
          return {"message":str(e)}
       
    # Buy Electricity Units
