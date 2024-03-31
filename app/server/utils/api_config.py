@@ -218,6 +218,7 @@ class FintavaOperations:
          # logger.info(f"{response.json()}")
          logger.info(f"Passed here!!")
          response_dict = json.loads(response.text)
+         logger.info(f"Passed here also!!")
          return response_dict
       except Exception as e:
          logger.info(f"{e}")
