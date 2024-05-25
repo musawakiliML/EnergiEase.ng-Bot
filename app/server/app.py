@@ -45,10 +45,11 @@ logger = logging.getLogger(__name__)
 WEBHOOK_PATH = "/telegram"
 
 # URL of your FastAPI server
-WEBHOOK_URL_STAGING = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
-# WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot.onrender.com" + WEBHOOK_PATH
-
-# WEBHOOK_URL_PRODUCTION_VERCEL = "https://energi-ease-ng-bot.vercel.app" + WEBHOOK_PATH
+if os.environ['DEBUG'] == "True":
+    WEBHOOK_URL_STAGING = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
+elif os.environ['DEBUG'] == "False":
+    WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot.onrender.com" + WEBHOOK_PATH
+    # WEBHOOK_URL_PRODUCTION_VERCEL = "https://energi-ease-ng-bot.vercel.app" + WEBHOOK_PATH
 
 
 
@@ -65,14 +66,11 @@ conv_handler = ConversationHandler(
             CallbackQueryHandler(customer_support_choice, pattern=str(SUPPORT))],
 
         CHOOSE_DISTRO: [
-            CallbackQueryHandler(choose_distro, pattern=r'AEDC|EEDC|EKEDC|IBEDCO|IKEDC|JED|KAEDCO|KEDCO|PHED|BEDC')],
-        
+            CallbackQueryHandler(choose_distro,
+                                 pattern=r'AEDC|EEDC|EKEDC|IBEDCO|IKEDC|JED|KAEDCO|KEDCO|PHED|BEDC')],
         COLLECT_METER_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, validate_meter_number)],
-        
         CHOOSE_METER_TYPE:[CallbackQueryHandler(choose_meter_type, pattern=r"prepaid|postpaid")],
-
         ELECTRICTY_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_electricity_amount)],
-
         ORDER_CONFIRMATION: [CallbackQueryHandler(order_confirmation)]
     },
     fallbacks=[CommandHandler("help", help)]
