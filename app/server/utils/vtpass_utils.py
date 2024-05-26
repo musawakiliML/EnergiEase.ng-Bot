@@ -97,8 +97,8 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
         # logger.info(f"{response}")
         if response == "000":
             user_meter_detail = {
-                "meter_name": meter_details["Customer_Name"],
-                "meter_address": meter_details["Address"],
+                "meter_name": meter_details['content']["Customer_Name"],
+                "meter_address": meter_details['content']["Address"],
                 "status": "200"
             }
             return user_meter_detail
@@ -109,7 +109,7 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
             }
     except Exception as e:
         return {
-            "status": meter_details['status'],
+            "status": "400",
             "message": "Error Occured!",
             "errors": str(e)
         }
@@ -173,6 +173,14 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
 
 
 # request_id = generated_request_id()
+
+# meter_details = vtpass.verify_meter(
+#             credentials=credentials,
+#             billers_code="1111111111111",
+#             service_id="jos-electric",
+#             meter_type="prepaid"
+#         )
+# print(meter_details)
 # test = vtpass.purchase_electricity_unit(
 #             request_id,
 #             "aba-electric",
@@ -185,10 +193,3 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
 #          )
 
 # print(test)
-
-
-
-
-# test = {'code': '000', 'content': {'transactions': {'status': 'delivered', 'product_name': 'Abuja Electricity Distribution Company- AEDC', 'unique_element': '1111111111111', 'unit_price': 1000, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': 15, 'total_amount': 985, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 1000, 'platform': 'api', 'method': 'api', 'transactionId': '16987845255804385875315820'}}, 'response_description': 'TRANSACTION SUCCESSFUL', 'requestId': '2023103121356eb4fc70052b', 'amount': '1000.00', 'transaction_date': {'date': '2023-10-31 21:35:25.000000', 'timezone_type': 3, 'timezone': 'Africa/Lagos'}, 'purchased_code': 'Token : 3359-3176-5478-0062-9598', 'MeterNumber': '04177505726', 'Token': '3359-3176-5478-0062-9598', 'ReceiptNumber': '7011202109137170448', 'PurchasedUnits': 89.9, 'DebtDescription': None, 'DebtAmount': None, 'RefundUnits': None, 'ServiceChargeVatExcl': None, 'Name': 'DOMINIC Gabriel ', 'Address': 'JABI JABI ABUJA Und St. Vendors Center', 'Reference': 'T21256131638cd89c5bf9b944168837a', 'Vat': 348.84, 'ResponseTime': '9/13/2021 1:16:44 PM', 'TariffRate': '89.9 KWH @ 51.75', 'FreeUnits': None, 'MeterCategory': 'Tariff Band A Non MD'}
-
-# print(str(test["purchased_code"].split(':')[1]).strip())
