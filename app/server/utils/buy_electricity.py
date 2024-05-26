@@ -1,181 +1,180 @@
-import logging
-from app.server.utils.api_config import FintavaCredentials, FintavaOperations
-from app.server.utils.vtpassport import 
+# import logging
+# from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 
-fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
+# fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 
-credentials = fintava_credentials.credentials()
+# credentials = fintava_credentials.credentials()
 
-fintava = FintavaOperations()
+# fintava = FintavaOperations()
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-# set higher logging level for httpx to avoid all GET and POST requests being logged
-logging.getLogger("httpx").setLevel(logging.WARNING)
+# # Enable logging
+# logging.basicConfig(
+#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+# )
+# # set higher logging level for httpx to avoid all GET and POST requests being logged
+# logging.getLogger("httpx").setLevel(logging.WARNING)
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
-# VTPASS FUnctions for Previewing Meter details and Buying Meter Units
+# # VTPASS FUnctions for Previewing Meter details and Buying Meter Units
 
 
-def get_meter_details_vtpass(meter_number, disco, meter_type):
-    """Get Meter Details VTPASS
+# def get_meter_details_vtpass(meter_number, disco, meter_type):
+#     """Get Meter Details VTPASS
 
-    Args:
-       meter_number (int): User Meter Number
-       disco (str): Distribution Company Name
-       meter_type (str): Meter Type(Prepaid or Postpaid)
+#     Args:
+#        meter_number (int): User Meter Number
+#        disco (str): Distribution Company Name
+#        meter_type (str): Meter Type(Prepaid or Postpaid)
 
-     Returns:
-       dict: Meters details dictionary
-    """
-    try:
-        meter_details = fintava.preview_meter_details(
-               credentials=credentials,
-               meter_number=meter_number,
-               disco=disco,
-               plan_type=meter_type
-               )
-         logger.info(f"{meter_details}")
-         response = meter_details.get("status", 400)
-      logger.info(f"{response}")
-      if response == "00":
-         user_meter_detail = {
-            "meter_name": meter_details["customer"]["name"],
-            "meter_address": meter_details["customer"]["address"],
-            "status":"200"
-         }
-         return user_meter_detail
-      else:
-         return {
-         "status":str(response),
-         "message": "Error Occured!"
-              }
-         # return {
-         #    "meter_name":"Musa Adamu",
-         #    "meter_address":"No.5 Beside Bauchi.",
-         #    "status": "200"
-         # }
-    except Exception:
-      return {
-         "status":meter_details['status'],
-         "message": "Error Occured!"
-              }
+#      Returns:
+#        dict: Meters details dictionary
+#     """
+#     try:
+#         meter_details = fintava.preview_meter_details(
+#                credentials=credentials,
+#                meter_number=meter_number,
+#                disco=disco,
+#                plan_type=meter_type
+#                )
+#          logger.info(f"{meter_details}")
+#          response = meter_details.get("status", 400)
+#       logger.info(f"{response}")
+#       if response == "00":
+#          user_meter_detail = {
+#             "meter_name": meter_details["customer"]["name"],
+#             "meter_address": meter_details["customer"]["address"],
+#             "status":"200"
+#          }
+#          return user_meter_detail
+#       else:
+#          return {
+#          "status":str(response),
+#          "message": "Error Occured!"
+#               }
+#          # return {
+#          #    "meter_name":"Musa Adamu",
+#          #    "meter_address":"No.5 Beside Bauchi.",
+#          #    "status": "200"
+#          # }
+#     except Exception:
+#       return {
+#          "status":meter_details['status'],
+#          "message": "Error Occured!"
+#               }
 
-# test = get_meter_details("0150000896855","Jos_Disco","prepaid")
-# print(test)
+# # test = get_meter_details("0150000896855","Jos_Disco","prepaid")
+# # print(test)
 
-# Buy Meter Unit
-def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type):
-   '''Buy Meter units'''
-   try:
-      user_meter_unit = fintava.buy_electricity_units(
-         credentials=credentials,
-         meter_number=meter_number,
-         disco=disco,
-         plan_type=meter_type,
-         amount=amount
-      )
-      # print(user_meter_unit)
-      response_status = user_meter_unit.get("status", 400)
-      if response_status == 200:
-         user_meter_unit_details = {
-            "meter_token": user_meter_unit["data"]["meter_token"],
-            "meter_units": user_meter_unit["data"]["units"],
-            "status":"200"
-         }
+# # Buy Meter Unit
+# def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type):
+#    '''Buy Meter units'''
+#    try:
+#       user_meter_unit = fintava.buy_electricity_units(
+#          credentials=credentials,
+#          meter_number=meter_number,
+#          disco=disco,
+#          plan_type=meter_type,
+#          amount=amount
+#       )
+#       # print(user_meter_unit)
+#       response_status = user_meter_unit.get("status", 400)
+#       if response_status == 200:
+#          user_meter_unit_details = {
+#             "meter_token": user_meter_unit["data"]["meter_token"],
+#             "meter_units": user_meter_unit["data"]["units"],
+#             "status":"200"
+#          }
 
-         return user_meter_unit_details
-      else:
-         return {
-            "status":str(response_status),
-            "message": "Error Occured!"
-               }
-   except Exception:
-      return {
-            "status":str(response_status),
-            "message": "Error Occured!"
-               }
+#          return user_meter_unit_details
+#       else:
+#          return {
+#             "status":str(response_status),
+#             "message": "Error Occured!"
+#                }
+#    except Exception:
+#       return {
+#             "status":str(response_status),
+#             "message": "Error Occured!"
+#                }
  
 
-# =========== Fintava Functions
-def get_meter_details(meter_number, disco, meter_type):
-   """Get Meter Details VTPASS
+# # =========== Fintava Functions =================
+# def get_meter_details(meter_number, disco, meter_type):
+#    """Get Meter Details VTPASS
 
-   Args:
-       meter_number (Integer): _description_
-       disco (_type_): _description_
-       meter_type (_type_): _description_
+#    Args:
+#        meter_number (Integer): _description_
+#        disco (_type_): _description_
+#        meter_type (_type_): _description_
 
-   Returns:
-       _type_: _description_
-   """
-   try:
-      meter_details = fintava.preview_meter_details(
-         credentials=credentials,
-         meter_number=meter_number,
-         disco=disco,
-         plan_type=meter_type
-         )
-      logger.info(f"{meter_details}")
-      response = meter_details.get("status", 400)
-      logger.info(f"{response}")
-      if response == "00":
-         user_meter_detail = {
-            "meter_name": meter_details["customer"]["name"],
-            "meter_address": meter_details["customer"]["address"],
-            "status":"200"
-         }
-         return user_meter_detail
-      else:
-         return {
-         "status":str(response),
-         "message": "Error Occured!"
-              }
-         # return {
-         #    "meter_name":"Musa Adamu",
-         #    "meter_address":"No.5 Beside Bauchi.",
-         #    "status": "200"
-         # }
-   except Exception:
-      return {
-         "status":meter_details['status'],
-         "message": "Error Occured!"
-              }
+#    Returns:
+#        _type_: _description_
+#    """
+#    try:
+#       meter_details = fintava.preview_meter_details(
+#          credentials=credentials,
+#          meter_number=meter_number,
+#          disco=disco,
+#          plan_type=meter_type
+#          )
+#       logger.info(f"{meter_details}")
+#       response = meter_details.get("status", 400)
+#       logger.info(f"{response}")
+#       if response == "00":
+#          user_meter_detail = {
+#             "meter_name": meter_details["customer"]["name"],
+#             "meter_address": meter_details["customer"]["address"],
+#             "status":"200"
+#          }
+#          return user_meter_detail
+#       else:
+#          return {
+#          "status":str(response),
+#          "message": "Error Occured!"
+#               }
+#          # return {
+#          #    "meter_name":"Musa Adamu",
+#          #    "meter_address":"No.5 Beside Bauchi.",
+#          #    "status": "200"
+#          # }
+#    except Exception:
+#       return {
+#          "status":meter_details['status'],
+#          "message": "Error Occured!"
+#               }
 
-# test = get_meter_details("0150000896855","Jos_Disco","prepaid")
-# print(test)
+# # test = get_meter_details("0150000896855","Jos_Disco","prepaid")
+# # print(test)
 
-# Buy Meter Unit
-def buy_meter_unit(meter_number, disco, amount, meter_type):
-   '''Buy Meter units'''
-   try:
-      user_meter_unit = fintava.buy_electricity_units(
-         credentials=credentials,
-         meter_number=meter_number,
-         disco=disco,
-         plan_type=meter_type,
-         amount=amount
-      )
-      # print(user_meter_unit)
-      response_status = user_meter_unit.get("status", 400)
-      if response_status == 200:
-         user_meter_unit_details = {
-            "meter_token": user_meter_unit["data"]["meter_token"],
-            "meter_units": user_meter_unit["data"]["units"],
-            "status":"200"
-         }
+# # Buy Meter Unit
+# def buy_meter_unit(meter_number, disco, amount, meter_type):
+#    '''Buy Meter units'''
+#    try:
+#       user_meter_unit = fintava.buy_electricity_units(
+#          credentials=credentials,
+#          meter_number=meter_number,
+#          disco=disco,
+#          plan_type=meter_type,
+#          amount=amount
+#       )
+#       # print(user_meter_unit)
+#       response_status = user_meter_unit.get("status", 400)
+#       if response_status == 200:
+#          user_meter_unit_details = {
+#             "meter_token": user_meter_unit["data"]["meter_token"],
+#             "meter_units": user_meter_unit["data"]["units"],
+#             "status":"200"
+#          }
 
-         return user_meter_unit_details
-      else:
-         return {
-            "status":str(response_status),
-            "message": "Error Occured!"
-               }
-   except Exception:
-      return {
-            "status":str(response_status),
-            "message": "Error Occured!"
-               }
+#          return user_meter_unit_details
+#       else:
+#          return {
+#             "status":str(response_status),
+#             "message": "Error Occured!"
+#                }
+#    except Exception:
+#       return {
+#             "status":str(response_status),
+#             "message": "Error Occured!"
+#                }

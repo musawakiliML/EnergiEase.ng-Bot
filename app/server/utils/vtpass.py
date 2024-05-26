@@ -95,17 +95,17 @@ class VTPASS:
                 "message": str(e)
             }
 
-    def verify_meter(self, billers_code, service_id, meter_type, credentials):
+    def verify_meter(self, billers_code, service_id, meter_type, credentials) -> dict:
         """Verifying the meter information
 
         Args:
             billers_code (int): The meter number you wish to make the bills payment on.
             service_id (int): Disco service ID: ikeja-electric
-            meter_type (string): 
-            credentials (tuple): _description_
+            meter_type (string): prepaid or postpaid
+            credentials (tuple): user credentials
 
         Returns:
-            _type_: _description_
+            dict: User verified Meter Details
         """
         try:
             live = credentials[3]
