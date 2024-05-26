@@ -85,11 +85,11 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
     """
     try:
         meter_details = vtpass.verify_meter(
-               credentials=credentials,
-               billers_code=meter_number,
-               service_id=disco,
-               meter_type=meter_type
-               )
+            credentials=credentials,
+            billers_code=meter_number,
+            service_id=disco,
+            meter_type=meter_type
+        )
 
         # logger.info(f"{meter_details}")
         response = meter_details.get("code")
@@ -99,71 +99,93 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
             user_meter_detail = {
                 "meter_name": meter_details["Customer_Name"],
                 "meter_address": meter_details["Address"],
-                "status":"200"
-                }
+                "status": "200"
+            }
             return user_meter_detail
         else:
             return {
-            "status":"400",
-            "message": "Error Occured!"
-              }
+                "status": "400",
+                "message": "Error Occured!"
+            }
     except Exception as e:
         return {
-            "status":meter_details['status'],
+            "status": meter_details['status'],
             "message": "Error Occured!",
             "errors": str(e)
+        }
+
+# Buy Meter Unit
+def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
+    '''Buy Meter units'''
+    try:
+        request_id = generated_request_id()
+        user_meter_unit = vtpass.purchase_electricity_unit(
+            credentials=credentials,
+            request_id=request_id,
+            service_id=disco,
+            billers_code=meter_number,
+            variation_code=meter_type,
+            amount=amount,
+            phone="08102778677"
+        )
+        response_status = user_meter_unit.get("code")
+        if response_status == "000":
+            if disco == "eko-electric":
+                product = "EKEDC"
+            elif disco == "ikeja-electric":
+                product = "IKEDC"
+            elif disco == "kano-electric":
+                product = "KEDCO"
+            elif disco == "kaduna-electric":
+                product = "KAEDCO"
+            elif disco == "portharcourt-electric":
+                product = "PHED"
+            elif disco == "jos-electric":
+                product = "JED"
+            elif disco == "ibadan-electric":
+                product = "IBEDC"
+            elif disco == "abuja-electric":
+                product = "AEDC"
+            elif disco == "enugu-electric":
+                product = "EEDC"
+            elif disco == "benin-electric":
+                product = "BEDC"
+            
+            token_units = get_token_units(user_meter_unit, product)
+            user_meter_unit_details = {
+                "meter_token": token_units["tokens"],
+                "meter_units": token_units["units"],
+                "status": "200"
             }
 
-# # Buy Meter Unit
-# def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type):
-#    '''Buy Meter units'''
-#    try:
-#       user_meter_unit = fintava.buy_electricity_units(
-#          credentials=credentials,
-#          meter_number=meter_number,
-#          disco=disco,
-#          plan_type=meter_type,
-#          amount=amount
-#       )
-#       # print(user_meter_unit)
-#       response_status = user_meter_unit.get("status", 400)
-#       if response_status == 200:
-#          user_meter_unit_details = {
-#             "meter_token": user_meter_unit["data"]["meter_token"],
-#             "meter_units": user_meter_unit["data"]["units"],
-#             "status":"200"
-#          }
-
-#          return user_meter_unit_details
-#       else:
-#          return {
-#             "status":str(response_status),
-#             "message": "Error Occured!"
-#                }
-#    except Exception:
-#       return {
-#             "status":str(response_status),
-#             "message": "Error Occured!"
-#                }
+            return user_meter_unit_details
+        else:
+            return {
+                "status": "400",
+                "message": "Error Occured!"
+            }
+    except Exception as e:
+        return {
+            "status": str(response_status),
+            "message": "Error Occured!",
+            "errors": str(e)
+        }
 
 
+# request_id = generated_request_id()
+# test = vtpass.purchase_electricity_unit(
+#             request_id,
+#             "aba-electric",
+#             # chat_payment_reference["user_meter_number"],
+#             "1111111111111",
+#             "postpaid",
+#             1000,
+#             "09089786543",
+#             credentials
+#          )
 
-request_id = generated_request_id()
-test = vtpass.purchase_electricity_unit(
-            request_id,
-            "yedc-electric",
-            # chat_payment_reference["user_meter_number"],
-            "1111111111111",
-            "prepaid",
-            1000,
-            "09089786543",
-            credentials
-         )
+# print(test)
 
-print(test)
-
-
-{'code': '000', 'content': {'transactions': {'status': 'delivered', 'product_name': 'Yola Electric  YEDC', 'unique_element': '1111111111111', 'unit_price': 1000, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': 15, 'total_amount': 985, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 1000, 'platform': 'api', 'method': 'api', 'transactionId': '17167202194142400896250023'}}, 'response_description': 'TRANSACTION SUCCESSFUL', 'requestId': '202405261143eb0591639101', 'amount': '1000.00', 'transaction_date': {'date': '2024-05-26 11:43:39.000000', 'timezone_type': 3, 'timezone': 'Africa/Lagos'}, 'purchased_code': ''}
 
 
 

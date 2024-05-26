@@ -135,7 +135,7 @@ class VTPASS:
     def purchase_electricity_unit(self, request_id: str,
                                   service_id: str, billers_code: str,
                                   variation_code: str, amount: int,
-                                  phone, credentials):
+                                  phone, credentials) -> dict:
         """Buy Meter Electricity Unit for Given Meter Number
 
         Args:

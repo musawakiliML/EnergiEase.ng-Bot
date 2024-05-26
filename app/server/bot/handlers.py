@@ -141,8 +141,8 @@ async def distro_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
     distribution_companies = [
         "AEDC", "EEDC", "EKEDC", "IBEDCO", "IKEDC",
-        "JED", "KAEDCO", "KEDCO", "PHED", "BEDC", "ABA", "YEDC"
-    ]
+        "JED", "KAEDCO", "KEDCO", "PHED", "BEDC"
+    ] # "ABA", "YEDC"
 
     buttons_per_row = 3  # Set the number of buttons per row
     reply_keyboard = [
