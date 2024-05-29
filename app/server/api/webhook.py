@@ -118,13 +118,13 @@ async def process_webhook(request: Request):
                 transaction_reference = transaction_details['eventData']['transactionReference']
                 transaction_status = "FAILED"
 
-                await verify_payment_buy_unit(transaction_reference, transaction_status)
+                await verify_payment_buy_unit(transaction_status, transaction_reference)
 
             return JSONResponse(
                 content={"status": "success", "msg": "Webhook received successfully"}, status_code=status.HTTP_200_OK)
     except Exception:
         return JSONResponse(
-            content={"status": "400", "msg": "Webhook Failed!"}, status_code=status.HTTP_200_OK)
+            content={"status": "400", "msg": "Webhook Failed!"}, status_code=status.HTTP_400_BAD_REQUEST)
 
 # @router.post("/", status_code=status.HTTP_200_OK)
 # async def process_webhook(request: Request):
