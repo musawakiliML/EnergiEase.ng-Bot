@@ -1,4 +1,4 @@
-from venv import logger
+import os
 from uuid6 import uuid7
 from telegram import Bot
 from dotenv import load_dotenv
