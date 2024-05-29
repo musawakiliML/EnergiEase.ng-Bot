@@ -420,25 +420,34 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
 
         amount = user_order_details["user_amount"]
 
-        generate_virtual_account = create_account(
-            name=name,
+        generate_virtual_account = create_account_monnify(
+            # name=name,
             amount=amount
         )
-        account_number = generate_virtual_account['Account Number']
-        account_name = generate_virtual_account['Account Name']
-        bank_name = generate_virtual_account['Bank']
-        transaction_id = generate_virtual_account["ID"]
-        payment_status = generate_virtual_account["Payment Status"]
+        if generate_virtual_account['Status'] == "200":
+            account_number = generate_virtual_account['Account Number']
+            account_name = generate_virtual_account['Account Name']
+            bank_name = generate_virtual_account['Bank']
+            transaction_id = generate_virtual_account["ID"]
+            payment_status = generate_virtual_account["Payment Status"]
 
-        account_details = order_payment(
-            amount, account_number, account_name, bank_name)
+            account_details = order_payment(
+                amount, account_number, account_name, bank_name)
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details)
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details)
 
-        await update_user_order(["transaction_id", transaction_id], session_id)
-        await update_user_order(["payment_confirmation", payment_status], session_id)
+            await update_user_order(["transaction_id", transaction_id], session_id)
+            await update_user_order(["payment_confirmation", payment_status], session_id)
 
-        return ConversationHandler.END
+            return ConversationHandler.END
+        elif generate_virtual_account['Status'] == "400":
+            reply_text = quit_chat()
+
+            await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=reply_text
+                    )
+            return ConversationHandler.END
 
 
 # Customer Support
