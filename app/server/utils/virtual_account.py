@@ -104,10 +104,11 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
                 unit_data = ["units", meter_unit]
                 unit_confirmation = ["unit_confirmation", "SUCCESSFUL"]
                 order_status = ["order_status", "COMPLETED"]
-                await update_user_order_transaction(token_data, transaction_reference)
-                await update_user_order_transaction(unit_data, transaction_reference)
-                await update_user_order_transaction(unit_confirmation, transaction_reference)
-                await update_user_order_transaction(order_status, transaction_reference)
+                transaction_id = transaction_reference
+                await update_user_order_transaction(token_data, transaction_id)
+                await update_user_order_transaction(unit_data, transaction_id)
+                await update_user_order_transaction(unit_confirmation, transaction_id)
+                await update_user_order_transaction(order_status, transaction_id)
                 return buy_unit
             else:
                 # Send Order Failed Message
@@ -120,8 +121,9 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
                 # Update Database
                 unit_confirmation = ["unit_confirmation", "FAILED"]
                 order_status = ["order_status", "FAILED"]
-                await update_user_order_transaction(unit_confirmation, transaction_reference)
-                await update_user_order_transaction(order_status, transaction_reference)
+                transaction_id = transaction_reference
+                await update_user_order_transaction(unit_confirmation, transaction_id)
+                await update_user_order_transaction(order_status, transaction_id)
                 return {
                     "status": buy_unit['status'],
                     "message": "Error Occured!"
@@ -135,7 +137,7 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
     except Exception:
         return {
             "status": buy_unit['status'],
-            "message": buy_unit['message']
+            "message": "Error Occured!"
         }
 
 
