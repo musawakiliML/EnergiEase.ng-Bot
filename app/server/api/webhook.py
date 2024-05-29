@@ -95,36 +95,34 @@ async def process_webhook(request: Request):
         payload_in_bytes, monnify_hash, request.headers)
     request_body = await request.json()
 
-    try:
-        if request_body:
-            """
-            if payload verification is successful, you can perform your necessary task, but if your planned processing would take time, you should first return a 200 response and process your stuff in background.
-            """
+    
+    logger.info(request_body)
+    if request_body:
+        """
+        if payload verification is successful, you can perform your necessary task, but if your planned processing would take time, you should first return a 200 response and process your stuff in background.
+        """
 
-            transaction_details = request_body
+        transaction_details = request_body
 
-            if transaction_details['eventType'] == "SUCCESSFUL_TRANSACTION":
-                transaction_reference = transaction_details['eventData']['transactionReference']
-                transaction_status = transaction_details['eventData']['paymentStatus']
+        if transaction_details['eventType'] == "SUCCESSFUL_TRANSACTION":
+            transaction_reference = transaction_details['eventData']['transactionReference']
+            transaction_status = transaction_details['eventData']['paymentStatus']
 
-                user_order_data = ["payment_confirmation", transaction_status]
+            user_order_data = ["payment_confirmation", transaction_status]
 
-                await update_user_order_transaction(user_order_data, transaction_reference)
-                await update_user_order_transaction(["transaction_reference", transaction_reference], transaction_reference)
+            await update_user_order_transaction(user_order_data, transaction_reference)
+            await update_user_order_transaction(["transaction_reference", transaction_reference], transaction_reference)
+            logger.info("Passed Request")
+            await verify_payment_buy_unit(transaction_status, transaction_reference)
 
-                await verify_payment_buy_unit(transaction_status, transaction_reference)
+        elif transaction_details['eventType'] == "REJECTED_PAYMENT":
+            transaction_reference = transaction_details['eventData']['transactionReference']
+            transaction_status = "FAILED"
 
-            elif transaction_details['eventType'] == "REJECTED_PAYMENT":
-                transaction_reference = transaction_details['eventData']['transactionReference']
-                transaction_status = "FAILED"
+            await verify_payment_buy_unit(transaction_status, transaction_reference)
 
-                await verify_payment_buy_unit(transaction_status, transaction_reference)
-
-            return JSONResponse(
-                content={"status": "success", "msg": "Webhook received successfully"}, status_code=status.HTTP_200_OK)
-    except Exception:
         return JSONResponse(
-            content={"status": "400", "msg": "Webhook Failed!"}, status_code=status.HTTP_400_BAD_REQUEST)
+            content={"status": "success", "msg": "Webhook received successfully"}, status_code=status.HTTP_200_OK)
 
 # @router.post("/", status_code=status.HTTP_200_OK)
 # async def process_webhook(request: Request):

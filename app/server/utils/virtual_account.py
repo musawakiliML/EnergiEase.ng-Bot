@@ -32,12 +32,15 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_API"]
 
 # Creating virtual account
-def create_account_monnify( amount: str) -> dict:
+
+
+def create_account_monnify(amount: str) -> dict:
     """Create Virtual Accounts"""
     try:
         transaction_reference = init_transaction(int(amount))
         if transaction_reference['status'] == "200":
-            virtual_account_details = init_bank_transfer(transaction_reference['transaction_reference'])
+            virtual_account_details = init_bank_transfer(
+                transaction_reference['transaction_reference'])
         if virtual_account_details['status'] == "200":
             account_details = {
                 "Account Name": virtual_account_details["Account Name"],
@@ -101,12 +104,13 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
                 unit_data = ["units", meter_unit]
                 unit_confirmation = ["unit_confirmation", "SUCCESSFUL"]
                 order_status = ["order_status", "COMPLETED"]
-                await update_user_order_transaction(token_data, transaction_id)
-                await update_user_order_transaction(unit_data, transaction_id)
-                await update_user_order_transaction(unit_confirmation, transaction_id)
-                await update_user_order_transaction(order_status, transaction_id)
+                await update_user_order_transaction(token_data, transaction_reference)
+                await update_user_order_transaction(unit_data, transaction_reference)
+                await update_user_order_transaction(unit_confirmation, transaction_reference)
+                await update_user_order_transaction(order_status, transaction_reference)
                 return buy_unit
             else:
+                # Send Order Failed Message
                 user_id = get_order_details['user_profile']['user_id']
 
                 await bot.send_message(chat_id=user_id, text=order_failed(
@@ -116,8 +120,8 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
                 # Update Database
                 unit_confirmation = ["unit_confirmation", "FAILED"]
                 order_status = ["order_status", "FAILED"]
-                await update_user_order_transaction(unit_confirmation, transaction_id)
-                await update_user_order_transaction(order_status, transaction_id)
+                await update_user_order_transaction(unit_confirmation, transaction_reference)
+                await update_user_order_transaction(order_status, transaction_reference)
                 return {
                     "status": buy_unit['status'],
                     "message": "Error Occured!"
@@ -133,8 +137,6 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
             "status": buy_unit['status'],
             "message": buy_unit['message']
         }
-
-
 
 
 # # def create_account(name: str, amount: str):
