@@ -1,11 +1,12 @@
 import logging
+import telegram
 from uuid6 import uuid7
 from datetime import datetime
 from telegram.ext import ContextTypes
 
 from telegram import (
     ReplyKeyboardRemove, Update,
-    InlineKeyboardButton, InlineKeyboardMarkup
+    InlineKeyboardButton, InlineKeyboardMarkup,
 )
 
 from telegram.ext import (
@@ -126,6 +127,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=reply_message,
+        parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
         reply_markup=markup,
     )
 
@@ -387,6 +389,7 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=reply_text,
+            parse_mode="markdown",
             reply_markup=markup,
         )
 
@@ -434,7 +437,7 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
             account_details = order_payment(
                 amount, account_number, account_name, bank_name)
 
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details)
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details, parse_mode="markdown")
 
             await update_user_order(["transaction_id", transaction_id], session_id)
             await update_user_order(["payment_confirmation", payment_status], session_id)
