@@ -87,7 +87,8 @@ class Monnify:
                 "currencyCode": "NGN",
                 "contractCode": credentials[2],
                 "redirectUrl": redirectUrl,
-                "paymentMethods": paymentMethods
+                "paymentMethods": paymentMethods,
+                # "bankCode": "232"
             }
             headers = {
                 'Content-Type': 'application/json'
@@ -108,6 +109,7 @@ class Monnify:
             url = f'{baseurl}/api/v1/merchant/bank-transfer/init-payment'
             payload = {
                 "transactionReference": transactionReference,
+                "bankCode": "50515",
             }
             headers = {
                 'Content-Type': 'application/json'
@@ -115,7 +117,7 @@ class Monnify:
 
             response = requests.request("POST", url, auth=HTTPBasicAuth(
                 credentials[0], credentials[1]), headers=headers, data=json.dumps(payload))
-
+            # print(response.text)
             r_dict = json.loads(response.text)
             return r_dict
         else:
