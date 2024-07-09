@@ -134,7 +134,8 @@ async def process_webhook(request: Request):
         if request_body['event'] == "VIRTUAL_WALLET_PAYMENT":
             transaction_details = request_body
 
-            # logger.info(request_body)
+            logger.info(request_body)
+            
 
             # Check Transaction Details
             if transaction_details['data']['status'] == "PAID" and transaction_details['data']['paymentStatus'] == "PAID":

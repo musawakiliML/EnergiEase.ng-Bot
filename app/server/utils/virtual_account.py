@@ -45,7 +45,9 @@ def create_account(name: str, amount: str) -> dict:
             description="Electricity Purchase",
             amount=amount,
         )
-        if virtual_account['status'] == 200:
+        # print(virtual_account)
+        status = virtual_account.get("status", 400)
+        if status == 200:
             account_details = {
                 "Account Name": virtual_account['data']['virtualAcctName'],
                 "Merchant Ref": virtual_account['data']['merchantReference'],
@@ -53,10 +55,16 @@ def create_account(name: str, amount: str) -> dict:
                 "Bank": virtual_account['data']['bank'],
                 "ID": virtual_account['data']['id'],
                 "Payment Status": virtual_account['data']['paymentStatus'],
-                "Status": "200"
+                "status": "200"
             }
 
             return account_details
+        else:
+            return {
+                "status": 400,
+                "message": "Error has occured!!"
+            }
+            
 
     except Exception:
         return {
@@ -145,6 +153,8 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             "message": "Error Occured!"
         }
 
+# test = create_account(name="Musa", amount="100")
+# print(test)
 
 # def create_account_monnify(amount: str) -> dict:
 #     """Create Virtual Accounts"""

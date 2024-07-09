@@ -1,7 +1,6 @@
 import os
-from dotenv import load_dotenv
-
 import logging
+from dotenv import load_dotenv
 
 from telegram.ext import Application, ContextTypes
 
@@ -24,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 # API Routes
-from app.server.api.webhook import router as Monnify_router
+from app.server.api.webhook import router as Fintava_router
 
 # Enable Bot Token
 load_dotenv()
@@ -106,7 +105,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(Monnify_router, tags=["Monnify Webhook"], prefix='/monnifywebhook')
+app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
 
 
 # Configure telegram bot webhook
