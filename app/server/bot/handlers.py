@@ -426,8 +426,8 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
 
         amount = user_order_details["user_amount"]
 
-        generate_virtual_account = create_account_monnify(
-            # name=name,
+        generate_virtual_account = create_account(
+            name=name,
             amount=amount
         )
         if generate_virtual_account['Status'] == "200":

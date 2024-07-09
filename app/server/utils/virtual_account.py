@@ -32,7 +32,7 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_API"]
 
 # Creating virtual account
-def create_account(name: str, amount: str):
+def create_account(name: str, amount: str) -> dict:
     """Create Virtual Accounts"""
     try:
         virtual_account = fintava.create_virtual_account(
@@ -53,7 +53,7 @@ def create_account(name: str, amount: str):
                 "Bank": virtual_account['data']['bank'],
                 "ID": virtual_account['data']['id'],
                 "Payment Status": virtual_account['data']['paymentStatus'],
-                "status": "200"
+                "Status": "200"
             }
 
             return account_details
@@ -65,7 +65,7 @@ def create_account(name: str, amount: str):
         }
 
 
-async def verify_payment_buy_unit(transaction_status, transaction_reference):
+async def verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference):
     '''Verify Payment to virtual account'''
     try:
         get_order_details = await get_single_order_transaction(transaction_reference)
@@ -74,7 +74,7 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
         # Creating a Bot Instance to send Order confirmation and Unit Token
         bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
-        if transaction_status == "PAID" and get_order_details['transaction_id'] == transaction_reference:
+        if transaction_status == "PAID" and get_order_details['transaction_id'] == transaction_id:
 
             # Send Order Confirmation Message
             user_id = get_order_details['user_profile']['user_id']
@@ -109,7 +109,7 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
                 unit_data = ["units", meter_unit]
                 unit_confirmation = ["unit_confirmation", "SUCCESSFUL"]
                 order_status = ["order_status", "COMPLETED"]
-                transaction_id = transaction_reference
+                # transaction_id = transaction_reference
                 await update_user_order_transaction(token_data, transaction_id)
                 await update_user_order_transaction(unit_data, transaction_id)
                 await update_user_order_transaction(unit_confirmation, transaction_id)
