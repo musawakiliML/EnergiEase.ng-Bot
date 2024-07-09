@@ -428,7 +428,7 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
 
         generate_virtual_account = create_account(
             name=name,
-            amount=amount
+            amount="10"  #amount
         )
         if generate_virtual_account['Status'] == "200":
             account_number = generate_virtual_account['Account Number']
