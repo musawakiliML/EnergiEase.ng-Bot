@@ -32,3 +32,18 @@ def order_serializer(input_data: dict) -> dict:
         "created_at": str(input_data["created_at"])
 
      }
+
+def meter_details_serializer(input_data: dict) -> dict:
+    '''Meter Details Serializer'''
+    return  {
+        "session_id": input_data["session_id"],
+        "meter_owner": input_data["meter_owner"],
+        "meter_number": input_data["meter_number"],
+        "meter_address": input_data["meter_address"],
+        "meter_account_number": input_data["meter_account_number"],
+        "meter_account_name": input_data["meter_account_name"],
+        "meter_bank_name": input_data["meter_bank_name"],
+        "meter_package": input_data["meter_package"],
+        "customer_id": input_data["customer_id"],
+    }
+    

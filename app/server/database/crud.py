@@ -1,12 +1,14 @@
 # from bson.objectid import ObjectId
 from app.server.database.config import (
     energiease_user_profile,
-    energiease_user_order
+    energiease_user_order,
+    energiease_meter_details
     )
 
 from app.server.schema.serializers import (
     user_profile_serializer,
-    order_serializer
+    order_serializer,
+    meter_details_serializer
     )
 
 # Create order
@@ -97,6 +99,45 @@ async def get_user_profile(session_id: str):
             return user_profile_serializer(user_profile)
         else:
             return {"message":"not_found"}
-        
+    except Exception as e:
+        return {"message":f"{str(e)}"}
+
+# ================== Creating Meter Details CRUD ====================
+
+# Create Meter Details
+async def create_meter_details(meter_details_data: dict):
+    '''Create a meter detail'''
+    try:
+        meter_details = await energiease_meter_details.insert_one(meter_details_data)
+        new_meter_details = await energiease_meter_details.find_one({"_id":meter_details.inserted_id})
+        if new_meter_details:
+            return meter_details_serializer(new_meter_details)
+    except Exception as e:
+        return {"Error in create meter details": str(e)}
+
+# Update Meter Details
+async def update_meter_details(meter_detail_data: list, session_id: str):
+    '''Update Meter Details'''
+    try:
+        update_meter_details_data = await energiease_meter_details.update_one({"session_id":session_id}, {"$set":{meter_detail_data[0]:meter_detail_data[1]}})
+        updated_meter_details = await energiease_meter_details.find_one({"session_id":session_id})
+
+        if updated_meter_details:
+            return meter_details_serializer(updated_meter_details)
+        else:
+            return {"Message":f'No post with this id: {id} found'}
+    except Exception as e:
+        return {"Error in update_meter_details": str(e)}
+
+# Get Meter Details
+async def get_meter_details(session_id: str):
+    '''Get a single meter details'''
+    try:
+        meter_details = await energiease_meter_details.find_one({"session_id":session_id})
+
+        if meter_details:
+            return meter_details_serializer(meter_details)
+        else:
+            return {"message":"Meter Details not found"}
     except Exception as e:
         return {"message":f"{str(e)}"}

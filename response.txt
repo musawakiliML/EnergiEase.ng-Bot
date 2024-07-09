@@ -1,0 +1,12 @@
+# Dedicated Account Creation
+{'status': True, 'message': 'NUBAN successfully created', 'data': {'bank': {'name': 'Test Bank', 'id': 24, 'slug': 'test-bank'}, 'account_name': 'TEST-MANAGED-ACCOUNT', 'account_number': '1238182358', 'assigned': True, 'currency': 'NGN', 'metadata': None, 'active': True, 'id': 10280231, 'created_at': '2023-03-03T08:52:44.000Z', 'updated_at': '2024-07-05T23:13:20.000Z', 'assignment': {'integration': 1214911, 'assignee_id': 173770194, 'assignee_type': 'Customer', 'expired': False, 'account_type': 'PAY-WITH-TRANSFER-RECURRING', 'assigned_at': '2024-07-05T23:13:20.158Z', 'expired_at': None}, 'customer': {'id': 173770194, 'first_name': 'John', 'last_name': 'Doe', 'email': 'johndoe@example.com', 'customer_code': 'CUS_tz7f618xpo5ymai', 'phone': None, 'metadata': None, 'risk_action': 'default', 'international_format_phone': None}}}
+
+# Create Customer
+{'status': True, 'message': 'Customer created', 'data': {'transactions': [], 'subscriptions': [], 'authorizations': [], 'first_name': 'John', 'email': 'johndoe@example.com', 'last_name': 'Doe', 'integration': 1214911, 'domain': 'test', 'customer_code': 'CUS_tz7f618xpo5ymai', 'risk_action': 'default', 'id': 173770194, 'createdAt': '2024-07-05T23:08:09.512Z', 'updatedAt': '2024-07-05T23:08:09.512Z', 'identified': False, 'identifications': None}}
+
+
+
+# 'sk_test_e2004b6a166a3e3d94a05abcbbeb63cc044c93d6'
+
+ATAFOM
+# sk_test_b67447e5f558ce0f519b156aaf5836c3a6db57c7

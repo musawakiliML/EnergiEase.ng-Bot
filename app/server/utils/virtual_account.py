@@ -3,7 +3,7 @@ from uuid6 import uuid7
 from telegram import Bot
 from dotenv import load_dotenv
 
-# from app.server.utils.api_config import *
+from app.server.utils.api_config import *
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
 from app.server.database.crud import (get_single_order_transaction,
                                       update_user_order,
@@ -14,16 +14,16 @@ from app.server.bot.message import (
     order_failed,
     order_successful
 )
-from app.server.utils.monnify_payment import (
-    init_bank_transfer,
-    init_transaction
-)
+# from app.server.utils.monnify_payment import (
+#     init_bank_transfer,
+#     init_transaction
+# )
 
-# fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
+fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 
-# credentials = fintava_credentials.credentials()
+credentials = fintava_credentials.credentials()
 
-# fintava = FintavaOperations()
+fintava = FintavaOperations()
 
 # Enable Bot Token
 load_dotenv()
@@ -32,31 +32,36 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_API"]
 
 # Creating virtual account
-
-
-def create_account_monnify(amount: str) -> dict:
+def create_account(name: str, amount: str):
     """Create Virtual Accounts"""
     try:
-        transaction_reference = init_transaction(int(amount))
-        if transaction_reference['status'] == "200":
-            virtual_account_details = init_bank_transfer(
-                transaction_reference['transaction_reference'])
-        if virtual_account_details['status'] == "200":
+        virtual_account = fintava.create_virtual_account(
+            credentials=credentials,
+            customer_name=name,
+            phone="+2348135810804",
+            email="musaadamuw@gmail.com",
+            expire_time=30,
+            merchant_reference=str(uuid7()).split("-")[4],
+            description="Electricity Purchase",
+            amount=amount,
+        )
+        if virtual_account['status'] == 200:
             account_details = {
-                "Account Name": virtual_account_details["Account Name"],
-                "Account Number": virtual_account_details['Account Number'],
-                "Bank": virtual_account_details['Bank Name'],
-                "ID": transaction_reference['transaction_reference'],
-                "Payment Status": "NOT PAID",
-                "Status": "200"
+                "Account Name": virtual_account['data']['virtualAcctName'],
+                "Merchant Ref": virtual_account['data']['merchantReference'],
+                "Account Number": virtual_account['data']['virtualAcctNo'],
+                "Bank": virtual_account['data']['bank'],
+                "ID": virtual_account['data']['id'],
+                "Payment Status": virtual_account['data']['paymentStatus'],
+                "status": "200"
             }
 
             return account_details
 
     except Exception:
         return {
-            "Status": "400",
-            "message": "Failed"
+            "status": virtual_account['status'],
+            "message": virtual_account['message']
         }
 
 
@@ -141,34 +146,27 @@ async def verify_payment_buy_unit(transaction_status, transaction_reference):
         }
 
 
-# # def create_account(name: str, amount: str):
-# #     """Create Virtual Accounts"""
-# #     try:
-# #         virtual_account = fintava.create_virtual_account(
-# #             credentials=credentials,
-# #             customer_name=name,
-# #             phone="+2348135810804",
-# #             email="musaadamuw@gmail.com",
-# #             expire_time=30,
-# #             merchant_reference=str(uuid7()).split("-")[4],
-# #             description="Electricity Purchase",
-# #             amount=amount,
-# #         )
-# #         if virtual_account['status'] == 200:
-# #             account_details = {
-# #                 "Account Name": virtual_account['data']['virtualAcctName'],
-# #                 "Merchant Ref": virtual_account['data']['merchantReference'],
-# #                 "Account Number": virtual_account['data']['virtualAcctNo'],
-# #                 "Bank": virtual_account['data']['bank'],
-# #                 "ID": virtual_account['data']['id'],
-# #                 "Payment Status": virtual_account['data']['paymentStatus'],
-# #                 "status": "200"
-# #             }
+# def create_account_monnify(amount: str) -> dict:
+#     """Create Virtual Accounts"""
+#     try:
+#         transaction_reference = init_transaction(int(amount))
+#         if transaction_reference['status'] == "200":
+#             virtual_account_details = init_bank_transfer(
+#                 transaction_reference['transaction_reference'])
+#         if virtual_account_details['status'] == "200":
+#             account_details = {
+#                 "Account Name": virtual_account_details["Account Name"],
+#                 "Account Number": virtual_account_details['Account Number'],
+#                 "Bank": virtual_account_details['Bank Name'],
+#                 "ID": transaction_reference['transaction_reference'],
+#                 "Payment Status": "NOT PAID",
+#                 "Status": "200"
+#             }
 
-# #             return account_details
+#             return account_details
 
 #     except Exception:
 #         return {
-#             "status": virtual_account['status'],
-#             "message": virtual_account['message']
+#             "Status": "400",
+#             "message": "Failed"
 #         }

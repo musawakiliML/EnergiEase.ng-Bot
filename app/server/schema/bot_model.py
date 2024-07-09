@@ -1,3 +1,4 @@
+from curses import noecho
 from typing import Optional, Union, List
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -19,7 +20,6 @@ class OrdersSchema(BaseModel):
     session_id: str | None
     meter_distribution: str | None
     user_meter_number: str | None
-    user_meter_number: str | None
     user_amount: str | None
     meter_type: str | None
     meter_code: str | None
@@ -31,3 +31,15 @@ class OrdersSchema(BaseModel):
     transaction_reference: str | None
     order_status: str | None
     created_at: Union[datetime, None] = None
+
+class MeterDetailsSchema(BaseModel):
+    '''Creating a Meter Details Model'''
+    session_id: str | None
+    meter_owner: str | None
+    meter_number: str | None
+    meter_address: str | None
+    meter_account_number: str | None
+    meter_account_name: str | None
+    meter_bank_name: str | None
+    meter_package: str | None
+    customer_id: str | None
