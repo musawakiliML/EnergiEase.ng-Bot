@@ -10,3 +10,8 @@
 
 ATAFOM
 # sk_test_b67447e5f558ce0f519b156aaf5836c3a6db57c7
+
+
+
+
+{'event': 'VIRTUAL_WALLET_PAYMENT', 'data': {'id': '7c19ce94-5418-4df5-abae-2c3392a21fbf', 'customerName': 'Musa Adamu Wakili', 'merchantReference': '4342eebe231f', 'reference': '090267240710203337043003333448', 'expireTimeInMin': 30, 'description': 'Electricity Purchase', 'metadata': None, 'amount': '100.00', 'phone': '+2348135810804', 'email': 'musaadamuw@gmail.com', 'bank': 'Loma Bank', 'virtualAcctName': 'Musa Wakili ML', 'virtualAcctNo': '0089646273', 'requestTime': '2024-07-10T19:29:39.373Z', 'status': 'PAID', 'paymentStatus': 'OVERPAID', 'sessionID': '090267240710203337043003333448', 'amountPaid': 1000, 'senderAccountName': 'MUSA WAKILI ADAMU', 'senderAccountNo': '2003333448', 'senderBankSortCode': '090267'}}

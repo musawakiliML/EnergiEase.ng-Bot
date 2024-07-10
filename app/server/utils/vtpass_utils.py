@@ -20,19 +20,18 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-api_key = os.environ['VTPASS_API_KEY']
-public_key = os.environ['VTPASS_PUBLIC_KEY']
-secret_key = os.environ['VTPASS_SECRET_KEY']
+api_key = os.environ['VTPASS_API_KEY_LIVE']
+public_key = os.environ['VTPASS_PUBLIC_KEY_LIVE']
+secret_key = os.environ['VTPASS_SECRET_KEY_LIVE']
 
 vtpass_credentials = VTPASSCredentials(
-    api_key, public_key, secret_key, is_live=False)
+    api_key, public_key, secret_key, is_live=True)
 
 credentials = vtpass_credentials.credentials()
 
 vtpass = VTPASS()
 
 # Generate Reference ID for VTPASS
-
 
 def generated_request_id():
     lagos_timezone = pytz.timezone('Africa/Lagos')
@@ -41,7 +40,6 @@ def generated_request_id():
     return date_time_id + reference_id
 
 # Extract Token From VTPASS Purchase
-
 
 def get_token_units(electricity_response, product):
     """Get Electricity Token and Units from VTPASS Purchase
