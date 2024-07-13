@@ -65,7 +65,7 @@ def customer_support():
 
 
 def quit_chat():
-    message = "Thank You For the using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
+    message = "Thank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
     return message
 
 
