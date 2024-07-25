@@ -137,7 +137,7 @@ async def process_webhook(request: Request):
             
 
             # Check Transaction Details
-            if transaction_details['data']['status'] == "PAID" and transaction_details['data']['paymentStatus'] == "PAID":
+            if transaction_details['data']['status'] == "PAID": #and transaction_details['data']['paymentStatus'] == "PAID":
                 transaction_reference = transaction_details['data']['merchantReference']
                 transaction_status = transaction_details['data']['paymentStatus']
                 transaction_id = transaction_details['data']['id']
