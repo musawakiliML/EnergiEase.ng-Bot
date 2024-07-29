@@ -126,6 +126,9 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
             amount=amount,
             phone="08102778677"
         )
+        
+        logger.info(f"{user_meter_unit}")
+        
         response_status = user_meter_unit.get("code")
         if response_status == "000":
             if disco == "eko-electric":
@@ -155,6 +158,7 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
                 "meter_units": token_units["units"],
                 "status": "200"
             }
+            logger.info(f"{user_meter_unit_details}")
 
             return user_meter_unit_details
         else:
