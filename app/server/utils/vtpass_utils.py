@@ -39,10 +39,12 @@ def generated_request_id():
     reference_id = str(uuid7()).split("-")[4]
     return date_time_id + reference_id
 
+# print(generated_request_id())
+
 # Extract Token From VTPASS Purchase
 
 def get_token_units(electricity_response, product):
-    """Get Electricity Token and Units from VTPASS Purchase
+    """ Get Electricity Token and Units from VTPASS Purchase
 
     Args:
         electricity_response (dict): VTPASS Response object
@@ -57,18 +59,28 @@ def get_token_units(electricity_response, product):
     try:
         tokens = str(
             electricity_response["purchased_code"].split(':')[1]).strip()
-        if product == "AEDC":
-            units = electricity_response['PurchasedUnits']
-        elif product == "IKEDC" or product == "EEDC" or product == "BEDC" or product == "PHED" or product == "KEDCO" or product == "KAEDCO":
-            units = electricity_response['units']
-        elif product == "EKEDC":
-            units = electricity_response['mainTokenUnits']
-        elif product == "IBEDCO" or product == "JED":
-            units = electricity_response['Units']
+        
+        unit_code = ['Units','PurchasedUnits','units','mainTokenUnits']
+        
+        for unit in unit_code:
+            units_value = electricity_response.get(unit, "None")
+            
+            if units_value != "None":
+                units = units_value
+                break
+        # if product == "AEDC":
+        #     units = electricity_response['PurchasedUnits']
+        # elif product == "IKEDC" or product == "EEDC" or product == "BEDC" or product == "PHED" or product == "KEDCO" or product == "KAEDCO":
+        #     units = electricity_response['units']
+        # elif product == "EKEDC":
+        #     units = electricity_response['mainTokenUnits']
+        # elif product == "IBEDCO" or product == "JED":
+        #     units = electricity_response['Units']
+        
+        # return units and tokens
         return {'tokens': tokens, 'units': units}
     except Exception as e:
         raise Exception({"message": str(e)})
-
 
 def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
     """Get Meter Details VTPASS
@@ -151,6 +163,10 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
                 product = "EEDC"
             elif disco == "benin-electric":
                 product = "BEDC"
+            elif disco == "aba-electric":
+                product = "ABA"
+            elif disco == "yola-electric":
+                product = "YEDC"
             
             token_units = get_token_units(user_meter_unit, product)
             user_meter_unit_details = {
