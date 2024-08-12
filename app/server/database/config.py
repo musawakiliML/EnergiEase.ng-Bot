@@ -30,3 +30,4 @@ database = client.energiease_bot
 energiease_user_profile = database.get_collection("energiease_user_profiles")
 energiease_user_order = database.get_collection("energiease_user_orders")
 energiease_meter_details = database.get_collection("energiease_meter_details")
+energiease_user_details = database.get_collection("energiease_user_details")

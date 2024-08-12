@@ -24,6 +24,8 @@ from contextlib import asynccontextmanager
 
 # API Routes
 from app.server.api.webhook import router as Fintava_router
+from app.server.api.dashboard import router as Dashboard_router
+from app.server.api.user import router as User_router
 
 # Enable Bot Token
 load_dotenv()
@@ -86,7 +88,7 @@ application.add_handler(help_command)
 application.add_handler(customer_support)
 application.add_handler(cancel_command)
 
-# Set up the webhook
+# # Set up the webhook
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
@@ -96,6 +98,7 @@ async def lifespan(_: FastAPI):
         await application.stop()
 
 app = FastAPI(lifespan=lifespan)
+# app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -106,6 +109,8 @@ app.add_middleware(
 )
 
 app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
+app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
+app.include_router(User_router, tags=['User Authentication'], prefix='/user')
 
 
 # Configure telegram bot webhook

@@ -4,7 +4,7 @@
 # Create Customer
 {'status': True, 'message': 'Customer created', 'data': {'transactions': [], 'subscriptions': [], 'authorizations': [], 'first_name': 'John', 'email': 'johndoe@example.com', 'last_name': 'Doe', 'integration': 1214911, 'domain': 'test', 'customer_code': 'CUS_tz7f618xpo5ymai', 'risk_action': 'default', 'id': 173770194, 'createdAt': '2024-07-05T23:08:09.512Z', 'updatedAt': '2024-07-05T23:08:09.512Z', 'identified': False, 'identifications': None}}
 
-
+08063459838
 
 # 'sk_test_e2004b6a166a3e3d94a05abcbbeb63cc044c93d6'
 
