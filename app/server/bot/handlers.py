@@ -372,7 +372,8 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
         else:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id, # type: ignore
-                text=order_failed(user_meter_info["_id"])
+                text=order_failed(user_meter_info["_id"]),
+                parse_mode="markdown"
             )
             # Update Order Details 
             unit_confirmation = ["unit_confirmation", "FAILED"]
@@ -437,7 +438,8 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
         
         await context.bot.send_message(
             chat_id=update.effective_chat.id, # type: ignore
-            text=reply_text
+            text=reply_text,
+            parse_mode="markdown"
         )
         
         return ConversationHandler.END
@@ -480,7 +482,8 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
         
             await context.bot.send_message(
                     chat_id=update.effective_chat.id, # type: ignore
-                    text=reply_text
+                    text=reply_text,
+                    parse_mode="markdown"
                     )
             
             # Update Order Details 
@@ -528,16 +531,16 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update_user_order(["payment_confirmation", "NO_PAYMENT"], session_id)
         
         await update.message.reply_text( # type: ignore
-        f"{reply_text}", reply_markup=ReplyKeyboardRemove()
+        f"{reply_text}", reply_markup=ReplyKeyboardRemove(), parse_mode="markdown"
     )
         
     else:
         await update.message.reply_text( # type: ignore
-        f"{quit_chat()}", reply_markup=ReplyKeyboardRemove()
+        f"{quit_chat()}", reply_markup=ReplyKeyboardRemove(), parse_mode="markdown"
     )
     
     # Clear user data to avoid lingering issues
-    context.user_data.clear() 
+    context.user_data.clear() # type: ignore
 
     return ConversationHandler.END
 

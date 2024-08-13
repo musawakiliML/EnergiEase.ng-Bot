@@ -43,7 +43,7 @@ def order_payment(amount: str, accountnumber: str, accountname: str, bankname: s
 
 
 def order_confirmation_message(order_id: str):
-    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id: {order_id}\n⌛ We are processing it."
+    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id: `{order_id}`\n⌛ We are processing it."
 
     return message
 
@@ -55,7 +55,7 @@ def order_successful(meter_unit: str, meter_number: str, meter_token: str):
 
 
 def order_failed(order_id: str):
-    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support with your Order Id:{order_id}, or send email to support@energieasebot.ng.\nJust type '/start' 👋 To start a new conversation.. \nThank you for choosing EnergiEase!🤗"
+    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support with your Order Id:`{order_id}`, or send email to support@energieasebot.ng.\nJust type '/start' 👋 To start a new conversation.. \nThank you for choosing EnergiEase!🤗"
     return message
 
 
@@ -69,7 +69,7 @@ def quit_chat():
     return message
 
 def cancel_order(order_id: str):
-    message = f"Your Order with ID:{order_id} has been cancelled ❌.\n\nThank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
+    message = f"Your Order with ID:`{order_id}` has been cancelled ❌.\n\nThank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
     return message
 
 def help_menu():
