@@ -74,19 +74,19 @@ conv_handler = ConversationHandler(
         ELECTRICTY_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_electricity_amount)],
         ORDER_CONFIRMATION: [CallbackQueryHandler(order_confirmation)]
     },
-    fallbacks=[CommandHandler("help", help)]
+    fallbacks=[CommandHandler("start", start), CommandHandler("cancel", cancel)]
 )
 
 # Configure Conversation Handlers
 application.add_handler(conv_handler)
 help_command = CommandHandler("help", help)
-cancel_command = CommandHandler("cancel", cancel)
+# cancel_command = CommandHandler("cancel", cancel)
 customer_support = CommandHandler("support", customer_support_command)
 
 # Add Command handlers
 application.add_handler(help_command)
 application.add_handler(customer_support)
-application.add_handler(cancel_command)
+# application.add_handler(cancel_command)
 
 # # Set up the webhook
 @asynccontextmanager
