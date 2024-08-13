@@ -60,6 +60,7 @@ application = Application.builder().token(TELEGRAM_BOT_TOKEN).read_timeout(600).
 # Add conversation handler with the states STARTCHOICE, CHOOSE_DISTRO
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
+    
     states={
         START_CHOICE: [
             # CallbackQueryHandler(distro_choice, pattern="^" + "electricity"),
@@ -69,11 +70,16 @@ conv_handler = ConversationHandler(
         CHOOSE_DISTRO: [
             CallbackQueryHandler(choose_distro,
                                  pattern=r'AEDC|EEDC|EKEDC|IBEDCO|IKEDC|JED|KAEDCO|KEDCO|PHED|BEDC')],
+        
         COLLECT_METER_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, validate_meter_number)],
+        
         CHOOSE_METER_TYPE:[CallbackQueryHandler(choose_meter_type, pattern=r"prepaid|postpaid")],
+        
         ELECTRICTY_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_electricity_amount)],
+        
         ORDER_CONFIRMATION: [CallbackQueryHandler(order_confirmation)]
     },
+    
     fallbacks=[CommandHandler("start", start), CommandHandler("cancel", cancel)]
 )
 
