@@ -151,12 +151,12 @@ async def process_webhook(request: Request):
                                               transaction_status,
                                               transaction_reference)
 
-            # elif transaction_details['data']['paymentStatus'] == "UNDERPAID":
-            #     transaction_id = transaction_details['data']['id']
-            #     transaction_reference = transaction_details['data']['merchantReference']
-            #     transaction_status = transaction_details['data']['paymentStatus']
+            else:
+                transaction_id = transaction_details['data']['id']
+                transaction_reference = transaction_details['data']['merchantReference']
+                transaction_status = transaction_details['data']['status']
 
-            #     await verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference)
+                await verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference)
 
         return JSONResponse(
             content={"status": "success",

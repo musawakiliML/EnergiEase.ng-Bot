@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends, Form
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import Annotated
+from collections import Counter
 
 from app.server.database.crud import get_user_profile_by_id, get_all_user_profile, get_all_orders, get_single_order_by_id, get_all_users_order, update_user_order_transaction
 from app.server.auth.auth import authenticate
@@ -114,7 +115,7 @@ async def get_single_order_view(id: str, user: str = Depends(authenticate)):
 # Get User Based Order
 
 @router.get("/user_order/{id}", response_description="Get All User Orders")
-async def get_user_order(id: str, user: str = Depends(authenticate)) -> JSONResponse:
+async def get_user_order(id: str, user: str = Depends(authenticate)) -> JSONResponse: # type: ignore
     try:
         # Get User Orders
         user_orders = await get_all_users_order(id)
@@ -167,48 +168,138 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
     try:
         # Get all orders
         get_order_details = await get_all_orders()
+        get_all_user_profiles = await get_all_user_profile()
+        
         if get_order_details.get("message") == "Successful":
             order_details = get_order_details['data']
             
             total_amount_of_units_purchased = 0
             total_number_of_units_purchased = 0
+            meter_counter = Counter()
+            user_counter = Counter()
+            distribution = Counter()
             most_purchasing_meter = ""
             most_purchasing_user = ""
-            count_meter_purchases = 0
-            # meters_list = [order_details['user_meter_number'] for i in order_details]
-            
-            # print(meters_list)
+            successful_payments = 0
+            successful_orders = 0
+            successful_units = 0
+            failed_payments = 0
+            failed_orders = 0
+            failed_units = 0
+            not_completed_payments = 0
+            not_completed_orders = 0
+            not_completed_units = 0
+            total_number_of_user_profiles = 0
+            distro_success_counter = Counter()
+            distro_failed_counter = Counter()
+            distro_not_completed_counter = Counter()
             
             # Analytics Calculations
             for order in order_details:
                # Total Amount Of Units Purchased
-               if order["user_amount"] == "":
-                  continue
-               elif order["user_amount"] and order['payment_confirmation'] == "PAID":
+               if order["user_amount"] and order['payment_confirmation'] == "PAID":
                   total_amount_of_units_purchased += order["user_amount"]
                   
                # Total Number of Units Purchased
-               if order['units'] == "":
-                  continue
-               elif order['payment_confirmation'] == "PAID" and order["unit_confirmation"] == "SUCCESSFUL":
+               if order['payment_confirmation'] == "PAID" and order["unit_confirmation"] == "SUCCESSFUL":
                   total_number_of_units_purchased += float(order['units'])
-                  # Most Purchasing Meter
-                  # count_meter_details['user_meter_details'] = ""
+                  
+               # Most Purchasing Meter (Top 3)
+               if order['user_meter_number'] and order["unit_confirmation"] == "SUCCESSFUL":
+                  meter_counter[order['user_meter_number']] += 1
+                  distribution[order['meter_distribution']] += 1
+               most_purchasing_meter = meter_counter.most_common(3)
                
-               # Most Purchasing User
+               # Most Purchasing User (Top 3)
+               if order['user_profile']['full_name'] and order["unit_confirmation"] == "SUCCESSFUL":
+                  user_counter[order['user_profile']['full_name']] += 1
+               most_purchasing_user = user_counter.most_common(3)
+               
                # Successful/Failed/Not Completed Payment
-               # Successful/Failed/Not Completed Unit
+               if order['payment_confirmation'] == "PAID":
+                  successful_payments += 1
+               elif order["payment_confirmation"] == "NO_PAYMENT":
+                  failed_payments += 1
+               else:
+                  not_completed_payments += 1
+               
+               # Successful/Failed/Not Completed Unit and distro
+               if order['unit_confirmation'] == "SUCCESSFUL":
+                  successful_units += 1
+               elif order['unit_confirmation'] == "FAILED":
+                  failed_units += 1
+               else:
+                  not_completed_units += 1
+               
                # Sucessful/Failed/Not Completed Order
-               # Total Number of Orders Received
-               # Total Number of User Profiles
-               # Most Purchased Distribution
-               # Numbers For Each Distro of Successful/Failed/Not Completed
+               if order['order_status'] == "COMPLETED":
+                  successful_orders += 1
+               elif order['order_status'] == "FAILED":
+                  failed_orders += 1
+               else:
+                  not_completed_orders += 1
+               
+               # Successful/Failed/Not Completed distribution summary
+               if order['meter_distribution'] and order['unit_confirmation'] == "SUCCESSFUL":
+                  distro_success_counter[order['meter_distribution']] += 1
+               elif order['unit_confirmation'] == "FAILED":
+                  distro_failed_counter[order['meter_distribution']] += 1
+               else:
+                  distro_not_completed_counter[order['meter_distribution']] += 1
+                  
+               
+            # Total Number of Orders Receive
+            total_orders_recieved = successful_orders + failed_orders + not_completed_orders
+            
+            # Total Number of User Profiles
+            total_number_of_user_profiles = len(get_all_user_profiles['data'])
+            
+            
+            # Most Purchased Distribution (Top 3)
+            most_purchased_distribution = distribution.most_common(3)
+            
+            # All distributions order summary
+            all_distribution_order_summary = distribution.items()
+            
+            # All Meter Order Summary
+            all_meter_order_summary = meter_counter.items()
+            
+            # Numbers For Each Distro of Successful/Failed/Not Completed
+            all_distribution_success_failed_summary = {
+               "Successful": distro_success_counter,
+               "Failed": distro_failed_counter,
+               "Not Completed": distro_not_completed_counter
+            }
+            
         response = {
             "message": "Successfully Generated Analytics",
             "status": status.HTTP_200_OK,
             "data": {
                 "total_amount_of_units_purchased": total_amount_of_units_purchased,
                 "total_number_of_units_purchased": total_number_of_units_purchased,
+                "most_purchasing_meters": most_purchasing_meter,
+                "most_purchasing_users": most_purchasing_user,
+                "payment_summary": {
+                   "successful":successful_payments,
+                   "failed":failed_payments,
+                   "not_completed": not_completed_payments
+                },
+                "unit_summary": {
+                   "successful": successful_units,
+                   "failed": failed_units,
+                   "not_completed": not_completed_units
+                },
+                "orders_summary" : {
+                   "successful": successful_orders,
+                   "failed": failed_orders,
+                   "not_completed": not_completed_orders
+                },
+                "total_orders_received": total_orders_recieved,
+                "total_number_of_user_profiles": total_number_of_user_profiles,
+                "most_purchased_distribution": most_purchased_distribution,
+                "all_distribution_order_summary": jsonable_encoder(all_distribution_order_summary),
+                "all_meter_order_summary": jsonable_encoder(all_meter_order_summary),
+                "all_distribution_successful_failed_summary": jsonable_encoder(all_distribution_success_failed_summary),
                 # Add more analytics here...
             }
         }

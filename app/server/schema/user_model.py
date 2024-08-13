@@ -104,7 +104,7 @@ class AdminUserSchema(BaseModel):
     updated_at: Union[datetime, None] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "username": "admiuser",
                 "email_address": "admin@email.com",

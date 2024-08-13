@@ -70,15 +70,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     # Get user Details
     user = update.effective_user
-    name = user.full_name
-    username = user.username
-    user_id = user.id
+    name = user.full_name # type: ignore
+    username = user.username # type: ignore
+    user_id = user.id # type: ignore
     created_at = datetime.now()
 
     # logger.info(f"{username}, {user_id}")
 
     # Create User Profile
-    user_profile = await get_user_profile(user_id)
+    user_profile = await get_user_profile(user_id) # type: ignore
     # logger.info(f"{user_profile}")
     try:
         # Check if user profile exists
@@ -123,12 +123,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     user_order_session = await create_order(user_order_data)
 
-    context.user_data["session_id"] = session_id
+    context.user_data["session_id"] = session_id # type: ignore
 
     reply_message = welcome_menu(name)
-    logger.info(f"{update.effective_chat.id}")
+    logger.info(f"{update.effective_chat.id}") # type: ignore
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=update.effective_chat.id, # type: ignore
         text=reply_message,
         parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
         reply_markup=markup,
@@ -142,7 +142,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def distro_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask the user for the distribution company"""
     query = update.callback_query
-    await query.answer()
+    await query.answer() # type: ignore
 
     distribution_companies = [
         "AEDC", "EEDC", "EKEDC", "IBEDCO", "IKEDC",
@@ -161,7 +161,7 @@ async def distro_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     markup = InlineKeyboardMarkup(reply_keyboard)
 
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=update.effective_chat.id, # type: ignore
         text=f"{options_menu()}",
         reply_markup=markup,
     )
@@ -176,18 +176,18 @@ async def choose_distro(update: Update, context: CallbackContext) -> int:
     Collect meter number from user and Validate the collected meter number'''
 
     query = update.callback_query
-    await query.answer()
+    await query.answer() # type: ignore
 
     # save user input in context memory
-    context.user_data["distribution_company"] = update.callback_query.data
+    context.user_data["distribution_company"] = update.callback_query.data # type: ignore
 
     # Save to database
-    session_id = context.user_data["session_id"]
-    user_order_data = ["meter_distribution", update.callback_query.data]
+    session_id = context.user_data["session_id"] # type: ignore
+    user_order_data = ["meter_distribution", update.callback_query.data] # type: ignore
     await update_user_order(user_order_data, session_id)
 
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=update.effective_chat.id, # type: ignore
         text=f"{meter_number_menu()}",
     )
     return COLLECT_METER_NUMBER
@@ -197,19 +197,19 @@ async def choose_distro(update: Update, context: CallbackContext) -> int:
 
 async def validate_meter_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Validate the collected meter number and get meter type"""
-    user_input = update.message.text.strip()
+    user_input = update.message.text.strip() # type: ignore
 
     if not user_input.isdigit() or (len(user_input) != 11 and len(user_input) != 13):
         
-        await update.message.reply_text("Invalid meter number. Please enter a 11 or 13-digit number.")
+        await update.message.reply_text("Invalid meter number. Please enter a 11 or 13-digit number.") # type: ignore
 
         return COLLECT_METER_NUMBER
 
     # Save meter number
-    context.user_data["meter_number"] = user_input
+    context.user_data["meter_number"] = user_input # type: ignore
 
     # Save to database
-    session_id = context.user_data["session_id"]
+    session_id = context.user_data["session_id"] # type: ignore
     user_order_data = ["user_meter_number", user_input]
     await update_user_order(user_order_data, session_id)
 
@@ -228,7 +228,7 @@ async def validate_meter_number(update: Update, context: ContextTypes.DEFAULT_TY
     markup = InlineKeyboardMarkup(reply_keyboard)
 
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=update.effective_chat.id, # type: ignore
         text="Choose your meter type:",
         reply_markup=markup,
     )
@@ -242,64 +242,64 @@ async def choose_meter_type(update: Update, context: CallbackContext) -> int:
     '''Collecting Meter type: Prepaid or Postpaid'''
 
     query = update.callback_query
-    await query.answer()
+    await query.answer() # type: ignore
 
     # save user meter type
-    context.user_data["meter_type"] = update.callback_query.data
+    context.user_data["meter_type"] = update.callback_query.data # type: ignore
 
     # Check Meter type and distro for equivalent data
-    if context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "prepaid":
+    if context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "abuja-electric"
-    elif context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "AEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "abuja-electric"
-    elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "enugu-electric"
-    elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "EEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "enugu-electric"
-    elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "eko-electric"
-    elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "EKEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "eko-electric"
-    elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "ibadan-electric"
-    elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "IBEDCO" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "ibadan-electric"
-    elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "ikeja-electric"
-    elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "IKEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "ikeja-electric"
-    elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "jos-electric"
-    elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "JED" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "jos-electric"
-    elif context.user_data["distribution_company"] == "ABA" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "ABA" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "aba-electric"
-    elif context.user_data["distribution_company"] == "ABA" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "ABA" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "aba-electric"
-    elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "kaduna-electric"
-    elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "KAEDCO" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "kaduna-electric"
-    elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "kano-electric"
-    elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "KEDCO" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "kano-electric"
-    elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "portharcourt-electric"
-    elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "PHED" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "portharcourt-electric"
-    elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "benin-electric"
-    elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "BEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "benin-electric"
-    elif context.user_data["distribution_company"] == "YEDC" and update.callback_query.data == "prepaid":
+    elif context.user_data["distribution_company"] == "YEDC" and update.callback_query.data == "prepaid": # type: ignore
         meter_code = "yola-electric"
-    elif context.user_data["distribution_company"] == "YEDC" and update.callback_query.data == "postpaid":
+    elif context.user_data["distribution_company"] == "YEDC" and update.callback_query.data == "postpaid": # type: ignore
         meter_code = "yola-electric"
 
     # Save to database
-    session_id = context.user_data["session_id"]
-    user_order_data = ["meter_type", update.callback_query.data]
+    session_id = context.user_data["session_id"] # type: ignore
+    user_order_data = ["meter_type", update.callback_query.data] # type: ignore
     user_meter_code = ["meter_code", meter_code]
     await update_user_order(user_order_data, session_id)
     await update_user_order(user_meter_code, session_id)
@@ -307,7 +307,7 @@ async def choose_meter_type(update: Update, context: CallbackContext) -> int:
     reply_message = bill_amount_menu()
 
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=update.effective_chat.id, # type: ignore
         text=reply_message,
     )
     return ELECTRICTY_AMOUNT
@@ -318,17 +318,17 @@ async def choose_meter_type(update: Update, context: CallbackContext) -> int:
 async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     '''Get Electricity Amount and validate it'''
     try:
-        electricity_amount = int(update.message.text)
+        electricity_amount = int(update.message.text) # type: ignore
         if electricity_amount < 1000:
-            await update.message.reply_text("❗Please enter an amount not below 1000:")
+            await update.message.reply_text("❗Please enter an amount not below 1000:") # type: ignore
 
             return ELECTRICTY_AMOUNT
 
         # Save Electricity Amount
-        context.user_data["electricity_amount"] = electricity_amount
+        context.user_data["electricity_amount"] = electricity_amount # type: ignore
 
         # Save to database
-        session_id = context.user_data["session_id"]
+        session_id = context.user_data["session_id"] # type: ignore
         user_order_data = ["user_amount", electricity_amount]
         await update_user_order(user_order_data, session_id)
 
@@ -371,12 +371,20 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
             meter_address = user_meter_details["meter_address"]
         else:
             await context.bot.send_message(
-                chat_id=update.effective_chat.id,
+                chat_id=update.effective_chat.id, # type: ignore
                 text=order_failed(user_meter_info["_id"])
             )
+            # Update Order Details 
+            unit_confirmation = ["unit_confirmation", "FAILED"]
+            order_status = ["order_status", "FAILED"]
+            payment_confirmation = ['payment_confirmation', "NO_PAYMENT"]
+            
+            await update_user_order(unit_confirmation, session_id)
+            await update_user_order(order_status, session_id)
+            await update_user_order(payment_confirmation, session_id)
             return ConversationHandler.END
 
-        session_id = context.user_data["session_id"]
+        session_id = context.user_data["session_id"] # type: ignore
         user_meter_name = ["meter_owner", meter_owner]
         user_meter_address = ["meter_address", meter_address]
 
@@ -391,7 +399,7 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
             address=meter_address)
 
         await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=update.effective_chat.id, # type: ignore
             text=reply_text,
             parse_mode="markdown",
             reply_markup=markup,
@@ -399,30 +407,47 @@ async def get_electricity_amount(update: Update, context: ContextTypes.DEFAULT_T
 
         return ORDER_CONFIRMATION
     except ValueError:
-        await update.message.reply_text("❗Please enter a valid number:")
+        await update.message.reply_text("❗Please enter a valid number:") # type: ignore
         return ELECTRICTY_AMOUNT
 
 # Handling Order Confirmation
 
 
-async def order_confirmation(update: Update, context: CallbackContext) -> int:
+async def order_confirmation(update: Update, context: CallbackContext) -> int: # type: ignore
     ''' Handling order confirmation '''
 
-    if update.callback_query.data == str(CANCEL_ORDER):
-        reply_text = quit_chat()
-
+    if update.callback_query.data == str(CANCEL_ORDER): # type: ignore
+        # Get user meter details from database
+        session_id = context.user_data["session_id"] # type: ignore
+        user_meter_info = await get_single_order(session_id)
+        
+        # Add Order Failed Message
+        reply_text = cancel_order(
+            order_id=user_meter_info["_id"]
+        )
+        
+        # Update Order Details 
+        unit_confirmation = ["unit_confirmation", "FAILED"]
+        order_status = ["order_status", "FAILED"]
+        payment_confirmation = ['payment_confirmation', "NO_PAYMENT"]
+        
+        await update_user_order(unit_confirmation, session_id)
+        await update_user_order(order_status, session_id)
+        await update_user_order(payment_confirmation, session_id)
+        
         await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=update.effective_chat.id, # type: ignore
             text=reply_text
         )
+        
         return ConversationHandler.END
 
-    elif update.callback_query.data == str(CONFIRM_ORDER):
+    elif update.callback_query.data == str(CONFIRM_ORDER): # type: ignore
         # Generate account details using API
         user = update.effective_user
-        name = user.full_name
+        name = user.full_name # type: ignore
 
-        session_id = context.user_data['session_id']
+        session_id = context.user_data['session_id'] # type: ignore
         user_order_details = await get_single_order(session_id)
 
         amount = user_order_details["user_amount"]
@@ -441,19 +466,32 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
             account_details = order_payment(
                 amount, account_number, account_name, bank_name)
 
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details, parse_mode="markdown")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details, parse_mode="markdown") # type: ignore
 
             await update_user_order(["transaction_id", transaction_id], session_id)
             await update_user_order(["payment_confirmation", payment_status], session_id)
 
             return ConversationHandler.END
-        elif generate_virtual_account['Status'] == "400":
-            reply_text = quit_chat()
-
+        elif generate_virtual_account['status'] == "400":
+            reply_text = order_failed(
+                order_id=user_order_details["_id"]
+            )
+            
+        
             await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
+                    chat_id=update.effective_chat.id, # type: ignore
                     text=reply_text
                     )
+            
+            # Update Order Details 
+            unit_confirmation = ["unit_confirmation", "FAILED"]
+            order_status = ["order_status", "FAILED"]
+            payment_confirmation = ['payment_confirmation', "NO_PAYMENT"]
+            
+            await update_user_order(unit_confirmation, session_id)
+            await update_user_order(order_status, session_id)
+            await update_user_order(payment_confirmation, session_id)
+            
             return ConversationHandler.END
 
 
@@ -461,13 +499,13 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int:
 async def customer_support_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask the user to chat the Customer Support on a Number"""
     query = update.callback_query
-    await query.answer()
+    await query.answer() # type: ignore
 
-    await query.edit_message_text(
+    await query.edit_message_text( # type: ignore
         "Welcome to Customer Support 🧑‍💻"
-        "Reach Us on @musawakiliml. For your inquiries."
+        "Reach Us on t.me/musawakiliml. For your inquiries."
         "Thank You."
-    )
+    ) 
 
     return START_CHOICE
 
@@ -476,7 +514,24 @@ async def customer_support_choice(update: Update, context: ContextTypes.DEFAULT_
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
-    await update.message.reply_text(
+    
+    session_id = context.user_data['session_id'] # type: ignore
+    user_order_details = await get_single_order(session_id)
+    if user_order_details:
+        # Add Order Failed Message
+        reply_text = cancel_order(
+            order_id=user_order_details["_id"]
+        )
+        await update_user_order(["unit_confirmation", "FAILED"], session_id)
+        await update_user_order(["order_status", "FAILED"], session_id)
+        await update_user_order(["payment_confirmation", "NO_PAYMENT"], session_id)
+        
+        await update.message.reply_text( # type: ignore
+        f"{reply_text}", reply_markup=ReplyKeyboardRemove()
+    )
+        
+    else:
+        await update.message.reply_text( # type: ignore
         f"{quit_chat()}", reply_markup=ReplyKeyboardRemove()
     )
 
@@ -487,7 +542,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     '''Display Bot Help Menu To User'''
-    await update.message.reply_text(
+    await update.message.reply_text( # type: ignore
         f"{help_menu()}"
     )
     return ConversationHandler.END
@@ -498,9 +553,9 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def customer_support_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask the user to chat the Customer Support on a Number"""
 
-    await update.message.reply_text(
+    await update.message.reply_text( # type: ignore
         "Welcome to EnergiEase Customer Support 🧑‍💻"
-        "Reach Us on @musawakiliml. For your inquiries."
+        "Reach Us on t.me/musawakiliml. For your inquiries."
         "Thank You."
     )
     return ConversationHandler.END

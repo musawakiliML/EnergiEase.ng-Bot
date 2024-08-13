@@ -31,9 +31,9 @@ async def login_view(user: OAuth2PasswordRequestForm = Depends()):
 
         if user_data.get('message') == "Successful":
             user_details = user_data.get('data')
-            if hash_password.verify_hash(user.password, user_details['password']):
+            if hash_password.verify_hash(user.password, user_details['password']): # type: ignore
                 access_token = create_access_token(
-                    user_details['email_address']
+                    user_details['email_address'] # type: ignore
                 )
                 response = {
                     "access_token": access_token,

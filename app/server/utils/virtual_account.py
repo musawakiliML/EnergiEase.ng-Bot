@@ -85,9 +85,9 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
         if transaction_status == "PAID" and get_order_details['transaction_id'] == transaction_id:
 
             # Send Order Confirmation Message
-            user_id = get_order_details['user_profile']['user_id']
+            user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-            await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id))
+            await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
 
             # Buy Electricity unit
             buy_unit = buy_meter_unit_vtpass(
@@ -104,9 +104,9 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
                 meter_unit = buy_unit['meter_units']
 
                 # Send Order Confirmation Message for buying units
-                user_id = get_order_details['user_profile']['user_id']
+                user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-                await bot.send_message(chat_id=user_id, text=order_successful(
+                await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
                     meter_number=get_order_details["user_meter_number"],
                     meter_unit=meter_unit,
                     meter_token=meter_token
@@ -125,31 +125,50 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
                 return buy_unit
             else:
                 # Send Order Failed Message
-                user_id = get_order_details['user_profile']['user_id']
+                user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-                await bot.send_message(chat_id=user_id, text=order_failed(
+                await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
                     order_id=order_id
                 )
                 )
+                
                 # Update Database
                 unit_confirmation = ["unit_confirmation", "FAILED"]
                 order_status = ["order_status", "FAILED"]
+                
                 transaction_id = transaction_reference
                 await update_user_order_transaction(unit_confirmation, transaction_id)
                 await update_user_order_transaction(order_status, transaction_id)
+                
                 return {
-                    "status": buy_unit['status'],
+                    "status": "400",
                     "message": "Error Occured!"
                 }
+        else:
+            # Send Order Failed Message
+            user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-        # # elif transaction_status == "UNDERPAID" and get_order_details['transaction_reference'] == transaction_reference:
-
-        #    return {
-        #       'message':"underpaid"
-        #       }
+            await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
+                order_id=order_id
+            )
+            )
+            
+            # Update Database
+            unit_confirmation = ["unit_confirmation", "FAILED"]
+            order_status = ["order_status", "FAILED"]
+            
+            transaction_id = transaction_reference
+            await update_user_order_transaction(unit_confirmation, transaction_id)
+            await update_user_order_transaction(order_status, transaction_id)
+            
+            return {
+                "status": "400",
+                "message": "Error Occured!"
+            }
+                
     except Exception:
         return {
-            "status": buy_unit['status'],
+            "status": "400",
             "message": "Error Occured!"
         }
 

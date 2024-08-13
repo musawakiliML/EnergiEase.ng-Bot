@@ -30,6 +30,7 @@ def order_serializer(input_data: dict) -> dict:
         "unit_confirmation": input_data["unit_confirmation"],
         "transaction_id": input_data["transaction_id"],
         "transaction_reference": input_data["transaction_reference"],
+        "order_status": input_data["order_status"],
         "created_at": str(input_data["created_at"])
 
     }
