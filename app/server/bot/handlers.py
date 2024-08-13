@@ -516,8 +516,8 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     
     session_id = str(context.user_data.get('session_id', 'None')) # type: ignore
-    
-    if session_id is not "None":
+    logger.info(f"Session ID: {session_id}")
+    if session_id != "None":
         user_order_details = await get_single_order(session_id)
         # Add Order Failed Message
         reply_text = cancel_order(
