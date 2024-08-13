@@ -96,7 +96,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             "created_at": created_at
         }
         user_profile = await create_user_profile(user_profile_data)
-
+    logger.info(f"{context.user_data}")
     # Create a new Order
     session_id = str(uuid7()).split("-")[4]
     created_at = datetime.utcnow()
