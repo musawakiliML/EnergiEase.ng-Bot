@@ -539,8 +539,8 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         f"{quit_chat()}", reply_markup=ReplyKeyboardRemove(), parse_mode="markdown"
     )
     
-    # Clear user data to avoid lingering issues
-    context.user_data.clear() # type: ignore
+    # # Clear user data to avoid lingering issues
+    # context.user_data.clear() # type: ignore
 
     return ConversationHandler.END
 
