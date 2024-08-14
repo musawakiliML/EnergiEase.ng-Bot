@@ -208,12 +208,12 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                if order['user_meter_number'] and order["unit_confirmation"] == "SUCCESSFUL":
                   meter_counter[order['user_meter_number']] += 1
                   distribution[order['meter_distribution']] += 1
-               most_purchasing_meter = meter_counter.most_common(3)
                
                # Most Purchasing User (Top 3)
                if order['user_profile']['full_name'] and order["unit_confirmation"] == "SUCCESSFUL":
                   user_counter[order['user_profile']['full_name']] += 1
-               most_purchasing_user = user_counter.most_common(3)
+               
+               
                
                # Successful/Failed/Not Completed Payment
                if order['payment_confirmation'] == "PAID":
@@ -247,16 +247,45 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                else:
                   distro_not_completed_counter[order['meter_distribution']] += 1
                   
-               
+            # Most Purchased Distribution (Top 3)
+            most_purchased_distribution = distribution.most_common(3)
+            
+            most_purchasing_meter = meter_counter.most_common(3)
+            
+            most_purchasing_user = user_counter.most_common(3)
+            
+            most_purchasing_distribution_list = []  
             # Total Number of Orders Receive
             total_orders_recieved = successful_orders + failed_orders + not_completed_orders
             
             # Total Number of User Profiles
             total_number_of_user_profiles = len(get_all_user_profiles['data'])
             
+            # Most Purchasing Meters Top (3)
+            most_purchasing_meter_list = []
             
-            # Most Purchased Distribution (Top 3)
-            most_purchased_distribution = distribution.most_common(3)
+            # Most Purchasing User Top (3)
+            most_purchasing_user_list = []
+               
+            for i in range(3):
+               most_purchasing_meter_list.append(
+                  {
+                     "meter":most_purchasing_meter[i][0],
+                     "number":most_purchasing_meter[i][1]
+                  })
+               most_purchasing_user_list.append(
+                  {
+                     "user":most_purchasing_user[i][0],
+                     "number":most_purchasing_user[i][1]
+                  }
+               )
+               
+               most_purchasing_distribution_list.append(
+                  {
+                     "name":most_purchased_distribution[i][0],
+                     "number": most_purchased_distribution[i][1]
+                  }
+               )
             
             # All distributions order summary
             all_distribution_order_summary = distribution.items()
@@ -277,8 +306,8 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
             "data": {
                 "total_amount_of_units_purchased": total_amount_of_units_purchased,
                 "total_number_of_units_purchased": total_number_of_units_purchased,
-                "most_purchasing_meters": most_purchasing_meter,
-                "most_purchasing_users": most_purchasing_user,
+                "most_purchasing_meters": most_purchasing_meter_list,
+                "most_purchasing_users": most_purchasing_user_list,
                 "payment_summary": {
                    "successful":successful_payments,
                    "failed":failed_payments,
@@ -296,7 +325,7 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                 },
                 "total_orders_received": total_orders_recieved,
                 "total_number_of_user_profiles": total_number_of_user_profiles,
-                "most_purchased_distribution": most_purchased_distribution,
+                "most_purchased_distribution": most_purchasing_distribution_list,
                 "all_distribution_order_summary": jsonable_encoder(all_distribution_order_summary),
                 "all_meter_order_summary": jsonable_encoder(all_meter_order_summary),
                 "all_distribution_successful_failed_summary": jsonable_encoder(all_distribution_success_failed_summary),
