@@ -478,11 +478,11 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
                 
                 response_url = transaction_url.get("transaction_url")
                 account_details = order_payment(
-                    amount, account_number, account_name, bank_name, transaction_url=response_url)
+                    str(amount), account_number, account_name, bank_name, transaction_url=response_url)
                 
             else:
                 account_details = order_payment(
-                    amount, account_number, account_name, bank_name, transaction_url="")
+                    str(amount), account_number, account_name, bank_name, transaction_url="")
 
             await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details, parse_mode="markdown") # type: ignore
 

@@ -40,7 +40,9 @@ async def paystack_webhook(request: Request):
 
             await verify_payment_buy_unit(transaction_id=transaction_reference,
                                           transaction_status="PAID",
-                                          transaction_reference=reference)
+                                          transaction_reference=reference,
+                                          payment_platform="Paystack",
+                                          amount_paid=transaction_amount)
          else:
             transaction_reference = request_body['data']['reference']
             transaction_status = request_body['data']['status']
@@ -48,7 +50,9 @@ async def paystack_webhook(request: Request):
             
             await verify_payment_buy_unit(transaction_id=transaction_reference,
                                           transaction_status="FAILED",
-                                          transaction_reference=reference)
+                                          transaction_reference=reference,
+                                          payment_platform="Paystack",
+                                          amount_paid=transaction_amount)
             
       response_body = {
          "message":"Webhook Received Successfully",

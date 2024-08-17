@@ -9,6 +9,7 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
+from app.server.api import paystack
 from app.server.utils.virtual_account import verify_payment_buy_unit
 from app.server.database.crud import update_user_order_transaction
 
@@ -142,22 +143,31 @@ async def process_webhook(request: Request):
                 transaction_reference = transaction_details['data']['merchantReference']
                 transaction_status = transaction_details['data']['status'] #['paymentStatus']
                 transaction_id = transaction_details['data']['id']
+                transaction_amount = transaction_details['data']['amountPaid']
 
                 user_order_data = ["payment_confirmation", transaction_status]
 
                 await update_user_order_transaction(user_order_data, transaction_id)
                 await update_user_order_transaction(["transaction_reference", transaction_reference], transaction_id)
 
-                await verify_payment_buy_unit(transaction_id,
-                                              transaction_status,
-                                              transaction_reference)
+                await verify_payment_buy_unit(transaction_id=transaction_id,
+                                              transaction_status=transaction_status,
+                                              transaction_reference=transaction_reference,
+                                              payment_platform="Fintava",
+                                              amount_paid=transaction_amount)
 
             else:
                 transaction_id = transaction_details['data']['id']
                 transaction_reference = transaction_details['data']['merchantReference']
                 transaction_status = transaction_details['data']['status']
+                transaction_amount = transaction_details['data']['amountPaid']
 
-                await verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference)
+                await verify_payment_buy_unit(
+                    transaction_id=transaction_id,
+                    transaction_status=transaction_status,
+                    transaction_reference=transaction_reference,
+                    payment_platform="Paystack",
+                    amount_paid=transaction_amount)
 
         return JSONResponse(
             content={"status": "success",

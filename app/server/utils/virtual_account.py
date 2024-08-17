@@ -73,7 +73,7 @@ def create_account(name: str, amount: str) -> dict:
         }
 
 
-async def verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference):
+async def verify_payment_buy_unit(transaction_id, transaction_status, transaction_reference, amount_paid, payment_platform):
     '''Verify Payment to virtual account'''
     try:
         get_order_details = await get_single_order_transaction(transaction_reference)
@@ -88,21 +88,30 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
             await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
-
+            
+            # Validated amount
+            amount = get_order_details['user_amount']
+            
+            service_fee = 100
+            
+            if amount_paid == int(amount) + service_fee:
+                updated_amount = amount_paid
+            else:
+                updated_amount = int(amount) - service_fee
+                  
             # Buy Electricity unit
-            # buy_unit = buy_meter_unit_vtpass(
-            #     meter_number=get_order_details["user_meter_number"],
-            #     meter_type=get_order_details["meter_type"],
-            #     disco=get_order_details["meter_code"],
-            #     amount=get_order_details["user_amount"]
-            # )
+            buy_unit = buy_meter_unit_vtpass(
+                meter_number=get_order_details["user_meter_number"],
+                meter_type=get_order_details["meter_type"],
+                disco=get_order_details["meter_code"],
+                amount=updated_amount
+            )
             
-            buy_unit = {
-                "status": "200",
-                "meter_token": "3032-1376-7369-2456-1296",
-                "meter_units": "16.2"
-            }
-            
+            # buy_unit = {
+            #     "status": "200",
+            #     "meter_token": "3032-1376-7369-2456-1296",
+            #     "meter_units": "16.2"
+            # }
             
             if buy_unit["status"] == "200":
 
@@ -117,7 +126,7 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
                     meter_number=get_order_details["user_meter_number"],
                     meter_unit=meter_unit,
                     meter_token=meter_token
-                )
+                ), parse_mode="markdown"
                 )
                 # Update Database
                 token_data = ["token", meter_token]
@@ -136,7 +145,7 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
 
                 await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
                     order_id=order_id
-                )
+                ), parse_mode="markdown"
                 )
                 
                 # Update Database
@@ -157,7 +166,7 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
 
             await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
                 order_id=order_id
-            )
+            ), parse_mode="markdown"
             )
             
             # Update Database
