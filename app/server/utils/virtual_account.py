@@ -100,7 +100,7 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             buy_unit = {
                 "status": "200",
                 "meter_token": "3032-1376-7369-2456-1296",
-                "meter_unit": "16.2"
+                "meter_units": "16.2"
             }
             
             
