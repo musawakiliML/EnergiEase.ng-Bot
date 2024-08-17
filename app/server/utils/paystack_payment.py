@@ -4,7 +4,7 @@ from app.server.utils import paystack_config
 from dotenv import load_dotenv
 
 load_dotenv()
-paystack_secret_key = os.environ["PAYSTACK_SECRET_KEY_TEST"]
+paystack_secret_key = os.environ["PAYSTACK_SECRET_KEY_LIVE"]
 
 # Initialize Paystack
 
