@@ -26,6 +26,7 @@ from contextlib import asynccontextmanager
 from app.server.api.webhook import router as Fintava_router
 from app.server.api.dashboard import router as Dashboard_router
 from app.server.api.user import router as User_router
+from app.server.api.paystack import router as Paystack_router
 
 # Enable Bot Token
 load_dotenv()
@@ -115,6 +116,7 @@ app.add_middleware(
 )
 
 app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
+app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
 app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
 app.include_router(User_router, tags=['User Authentication'], prefix='/user')
 

@@ -1,16 +1,7 @@
-import os
 import json
-import uuid6
 import requests
-from dotenv import load_dotenv
-from telegram import Credentials
-
-load_dotenv()
-paystack_secret_key = os.environ["PAYSTACK_SECRET_KEY_TEST"]
-# print(paystack_secret_key)
 
 # API Base urls for testing and live production
-
 
 class GetBaseUrl:
     """Get Base URL
@@ -44,7 +35,7 @@ class Paystack:
 
     def create_customer(self, credentials,
                         first_name,
-                        last_name, email) -> dict:
+                        last_name, email) -> dict: 
         try:
             key = credentials[0]
             live = credentials[1]
@@ -162,10 +153,7 @@ class Paystack:
 
 
 # testing
-# Credentials = PaystackCredential(secret_key=paystack_secret_key, is_live=True)
-# credentials = Credentials.credentials()
-# paystack = Paystack()
-# payment_reference = str(uuid6.uuid7())
+
 # response = paystack.create_customer(credentials=credentials,
 #                                            first_name="John",
 #                                            last_name="Doe",
@@ -173,14 +161,10 @@ class Paystack:
 #                                            )
 # response = paystack.create_dedicated_account(credentials=credentials,
 #                                              customer="CUS_tz7f618xpo5ymai")
-# response = paystack.create_transaction(credentials=credentials,
-#                                              email='johndoe@example.com',
-#                                              amount="1000",
-#                                              payment_reference=payment_reference
-#                                              )
+
 # response = paystack.create_charge(credentials=credentials,
 #                                   email='johndoe@example.com',
-#                                   amount="1000",
+#                                   amount="100",
 #                                   payment_reference=payment_reference
 #                                   )
-# print(response)
+

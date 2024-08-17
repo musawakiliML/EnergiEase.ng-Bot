@@ -90,13 +90,20 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
 
             # Buy Electricity unit
-            buy_unit = buy_meter_unit_vtpass(
-                meter_number=get_order_details["user_meter_number"],
-                meter_type=get_order_details["meter_type"],
-                disco=get_order_details["meter_code"],
-                amount=get_order_details["user_amount"]
-            )
-
+            # buy_unit = buy_meter_unit_vtpass(
+            #     meter_number=get_order_details["user_meter_number"],
+            #     meter_type=get_order_details["meter_type"],
+            #     disco=get_order_details["meter_code"],
+            #     amount=get_order_details["user_amount"]
+            # )
+            
+            buy_unit = {
+                "status": "200",
+                "meter_token": "3032-1376-7369-2456-1296",
+                "meter_unit": "16.2"
+            }
+            
+            
             if buy_unit["status"] == "200":
 
                 # Get Order details

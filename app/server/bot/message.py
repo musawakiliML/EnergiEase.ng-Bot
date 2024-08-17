@@ -36,8 +36,8 @@ def order_summary(owner: str, amount: str, meter_number: str, package: str, addr
     return message
 
 
-def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str):
-    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number:`{accountnumber}`\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n ⌛ Your request would be processed automatically once we received your payment."
+def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str, transaction_url: str | None):
+    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number:`{accountnumber}`\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇: \n {transaction_url} \n\n ⌛ Your request would be processed automatically once we received your payment."
 
     return message
 

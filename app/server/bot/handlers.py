@@ -21,6 +21,7 @@ from app.server.utils.virtual_account import *
 from app.server.utils.vtpass_utils import (
     get_meter_details_vtpass
 )
+from app.server.utils.paystack_payment import create_transaction_url
 
 # Database Modules
 from app.server.database.crud import (
@@ -464,9 +465,24 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
             bank_name = generate_virtual_account['Bank']
             transaction_id = generate_virtual_account["ID"]
             payment_status = generate_virtual_account["Payment Status"]
-
-            account_details = order_payment(
-                amount, account_number, account_name, bank_name)
+            
+            # Create Transaction URL for Paystack Payment
+            transaction_url: dict = create_transaction_url(
+                amount=amount,
+                payment_reference=transaction_id
+            )
+            status = transaction_url.get("status", None)
+            
+            if status == "200":
+                # Get the transaction url
+                
+                response_url = transaction_url.get("transaction_url")
+                account_details = order_payment(
+                    amount, account_number, account_name, bank_name, transaction_url=response_url)
+                
+            else:
+                account_details = order_payment(
+                    amount, account_number, account_name, bank_name, transaction_url="")
 
             await context.bot.send_message(chat_id=update.effective_chat.id, text=account_details, parse_mode="markdown") # type: ignore
 
@@ -479,7 +495,6 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
                 order_id=user_order_details["_id"]
             )
             
-        
             await context.bot.send_message(
                     chat_id=update.effective_chat.id, # type: ignore
                     text=reply_text,
