@@ -92,7 +92,7 @@ async def create_user_profile(user_profile_data: dict):
     try:
         user_profile = await energiease_user_profile.insert_one(user_profile_data)
         new_user_profile = await energiease_user_profile.find_one({"_id": user_profile.inserted_id})
-        return user_profile_serializer(new_user_profile) # type: ignore
+        return user_profile_serializer(new_user_profile)  # type: ignore
 
     except Exception as e:
         return {"message": f"{str(e)}"}
@@ -102,6 +102,7 @@ async def create_user_profile(user_profile_data: dict):
 
 async def get_user_profile(session_id: str):
     '''Get a single user'''
+
     try:
         user_profile = await energiease_user_profile.find_one({"user_id": session_id})
 
@@ -115,7 +116,7 @@ async def get_user_profile(session_id: str):
 # Get User Profile by ID
 
 
-async def get_user_profile_by_id(user_id: str) -> dict: # type: ignore
+async def get_user_profile_by_id(user_id: str) -> dict:  # type: ignore
     ''' Get Single User Profile by ID'''
     try:
         user_profile = await energiease_user_profile.find_one({"_id": ObjectId(user_id)})
@@ -179,7 +180,7 @@ async def get_all_orders() -> dict:
 # Get Single Order
 
 
-async def get_single_order_by_id(id: str) -> dict: # type: ignore
+async def get_single_order_by_id(id: str) -> dict:  # type: ignore
     ''' Get Single User Orders'''
     try:
         # Get Single Order
@@ -223,7 +224,7 @@ async def get_all_users_order(id: str) -> dict:
 # Create user account
 
 
-async def create_user(user_details: dict) -> dict: # type: ignore
+async def create_user(user_details: dict) -> dict:  # type: ignore
     try:
         user_data = await energiease_user_details.insert_one(user_details)
         new_user_data = await energiease_user_details.find_one({"_id": user_data.inserted_id})

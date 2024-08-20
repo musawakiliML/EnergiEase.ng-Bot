@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, status, Form, UploadFile, Body, Depends
+from fastapi import APIRouter, HTTPException, status, Form, UploadFile, Body, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
@@ -10,7 +10,7 @@ from app.server.auth.hash_password import HashPassword
 from app.server.utils.supabase_util import upload_to_supabase
 from app.server.database.crud import get_user_by_id, create_user, update_user_by_id, get_user_by_email
 from app.server.schema.user_model import UserUpdateSchema
-from app.server.auth.jwt_handler import create_access_token, verify_access_token
+from app.server.auth.jwt_handler import create_access_token, verify_access_token, create_refresh_token
 from app.server.auth.auth import authenticate
 
 
@@ -27,21 +27,30 @@ hash_password = HashPassword()
 @router.post("/login", status_code=status.HTTP_200_OK, response_description="User Login")
 async def login_view(user: OAuth2PasswordRequestForm = Depends()):
     try:
+        # print(user.username)
         user_data = await get_user_by_email(email=user.username)
-
+        
         if user_data.get('message') == "Successful":
             user_details = user_data.get('data')
+            # type: ignore
+            
             if hash_password.verify_hash(user.password, user_details['password']): # type: ignore
                 access_token = create_access_token(
-                    user_details['email_address'] # type: ignore
+                    user_details['email_address']  # type: ignore
                 )
+                
+                refresh_token = create_refresh_token(
+                    {"user": user_details['email_address']})  # type: ignore
+                # print(refresh_token)
                 response = {
                     "access_token": access_token,
+                    "refresh_token": refresh_token,
                     "token_type": "Bearer"
                 }
+
                 return JSONResponse(
-                   content=response,
-                   status_code=status.HTTP_200_OK
+                    content=response,
+                    status_code=status.HTTP_200_OK
                 )
     except Exception as e:
         response = {
@@ -51,6 +60,38 @@ async def login_view(user: OAuth2PasswordRequestForm = Depends()):
         return JSONResponse(
             content=response,
             status_code=status.HTTP_401_UNAUTHORIZED
+        )
+
+# Refresh Token
+
+
+@router.post("/refresh", response_description="Refresh Token")
+async def refresh_token(refresh_token: str):
+    try:
+        payload = verify_access_token(refresh_token)
+        
+        user_email = payload.get("user")
+
+        if user_email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token"
+            )
+
+        access_token = create_access_token(user_email)
+        return JSONResponse(
+            content={
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "token_type": "Bearer"
+            },
+            status_code=status.HTTP_200_OK
+        )
+    except Exception as e:
+        print(str(e))
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid Token Provided"
         )
 
 # Signup View

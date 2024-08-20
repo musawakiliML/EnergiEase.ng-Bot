@@ -194,8 +194,8 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
 
 # meter_details = vtpass.verify_meter(
 #             credentials=credentials,
-#             billers_code="1111111111111",
-#             service_id="jos-electric",
+#             billers_code="0219221239227",
+#             service_id="abuja-electric",
 #             meter_type="prepaid"
 #         )
 # print(meter_details)
