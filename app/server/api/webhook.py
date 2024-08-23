@@ -183,7 +183,7 @@ async def process_webhook(request: Request):
 
 
 # Cron Job to Keep the Server Alive
-@router.get("/cronjob")
+@router.get("/cronjob/")
 async def bot_cron_job():
     try:
         response_body = {
