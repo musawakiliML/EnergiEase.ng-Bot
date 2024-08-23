@@ -1,16 +1,36 @@
 import json
 from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, status, Form, UploadFile, Body, Depends
+from fastapi import (
+    APIRouter,
+    HTTPException,
+    status,
+    Form,
+    UploadFile,
+    Body,
+    Depends
+    )
+
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.server.auth.hash_password import HashPassword
 from app.server.utils.supabase_util import upload_to_supabase
-from app.server.database.crud import get_user_by_id, create_user, update_user_by_id, get_user_by_email
+from app.server.database.crud import (
+    get_user_by_id,
+    create_user,
+    update_user_by_id,
+    get_user_by_email
+    )
+
 from app.server.schema.user_model import UserUpdateSchema
-from app.server.auth.jwt_handler import create_access_token, verify_access_token, create_refresh_token
+from app.server.auth.jwt_handler import (
+    create_access_token,
+    verify_access_token,
+    create_refresh_token
+    )
+
 from app.server.auth.auth import authenticate
 
 
@@ -27,7 +47,7 @@ hash_password = HashPassword()
 @router.post("/login", status_code=status.HTTP_200_OK, response_description="User Login")
 async def login_view(user: OAuth2PasswordRequestForm = Depends()):
     try:
-        # print(user.username)
+        
         user_data = await get_user_by_email(email=user.username)
         
         if user_data.get('message') == "Successful":
@@ -41,7 +61,7 @@ async def login_view(user: OAuth2PasswordRequestForm = Depends()):
                 
                 refresh_token = create_refresh_token(
                     {"user": user_details['email_address']})  # type: ignore
-                # print(refresh_token)
+                
                 response = {
                     "access_token": access_token,
                     "refresh_token": refresh_token,
@@ -99,7 +119,16 @@ async def refresh_token(refresh_token: str):
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_description="Create A New User")
 async def create_user_view(
-        first_name: Annotated[str, Form()], last_name: Annotated[str, Form()], username: Annotated[str, Form()], email_address: Annotated[str, Form()], password: Annotated[str, Form()], role: Annotated[str, Form()], active: Annotated[str, Form()], location: Annotated[str, Form()], profile_pic: UploadFile):
+        first_name: Annotated[str, Form()],
+        last_name: Annotated[str, Form()],
+        username: Annotated[str, Form()],
+        email_address: Annotated[str, Form()],
+        password: Annotated[str, Form()],
+        role: Annotated[str, Form()],
+        active: Annotated[str, Form()],
+        location: Annotated[str, Form()],
+        profile_pic: UploadFile
+        ):
     try:
         # Check if user email exists
         get_user = await get_user_by_email(email=email_address)
@@ -121,7 +150,6 @@ async def create_user_view(
             profile_pic.file, profile_pic.filename)  # type: ignore
 
         url_response = json.loads(upload_response.body)
-       #   print(url_response)
 
         if url_response['status'] == 200:
             public_url = url_response['public_url']

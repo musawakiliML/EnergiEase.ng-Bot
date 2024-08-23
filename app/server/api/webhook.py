@@ -179,3 +179,26 @@ async def process_webhook(request: Request):
             "status": request_body['data']['status'],
             "message": request_body['data']['message']
         }
+
+
+
+# Cron Job to Keep the Server Alive
+@router.get("/cronjob")
+async def bot_cron_job():
+    try:
+        response_body = {
+            'message': "Successfull",
+            'status': status.HTTP_200_OK
+        }
+        return JSONResponse(
+            content=response_body,
+            status_code=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return JSONResponse(
+            content={
+                'message': "Failed",
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

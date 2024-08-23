@@ -5,14 +5,14 @@ from app.server.database.config import (
     energiease_user_order,
     energiease_meter_details,
     energiease_user_details,
-)
+    )
 
 from app.server.schema.serializers import (
     user_profile_serializer,
     order_serializer,
     meter_details_serializer,
     user_details_serializer,
-)
+    )
 
 
 # ================ Order Crud ================= #

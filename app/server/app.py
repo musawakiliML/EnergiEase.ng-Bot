@@ -7,9 +7,12 @@ from telegram.ext import Application, ContextTypes
 from telegram import Update
 
 from telegram.ext import (
-   CommandHandler, ConversationHandler,
-   MessageHandler, filters, CallbackQueryHandler
-)
+   filters,
+   CommandHandler,
+   MessageHandler,
+   ConversationHandler,
+   CallbackQueryHandler
+   )
 
 # Get Modules for chatbot messages
 from app.server.bot.message import *

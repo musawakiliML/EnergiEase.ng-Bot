@@ -6,21 +6,23 @@ from telegram.ext import ContextTypes
 
 from telegram import (
     ReplyKeyboardRemove, Update,
-    InlineKeyboardButton, InlineKeyboardMarkup,
-)
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    )
 
 from telegram.ext import (
-    CallbackContext, ConversationHandler
-)
+    CallbackContext,
+    ConversationHandler
+    )
 
-# Get Modules for chatbot messages
+# Get Modules for Chatbot Messages
 from app.server.bot.message import *
 
 # Get Account Creation Modules and Electricity bills
 from app.server.utils.virtual_account import *
 from app.server.utils.vtpass_utils import (
     get_meter_details_vtpass
-)
+    )
 from app.server.utils.paystack_payment import create_transaction_url
 
 # Database Modules
@@ -33,7 +35,7 @@ from app.server.database.crud import (
     create_meter_details,
     get_meter_details,
     update_meter_details
-)
+    )
 
 # Enable logging
 logging.basicConfig(
