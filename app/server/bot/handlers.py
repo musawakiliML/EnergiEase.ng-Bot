@@ -470,7 +470,7 @@ async def order_confirmation(update: Update, context: CallbackContext) -> int: #
             
             # Create Transaction URL for Paystack Payment
             transaction_url: dict = create_transaction_url(
-                amount=amount,
+                amount=int(amount) * 100,
                 payment_reference=transaction_id
             )
             status = transaction_url.get("status", None)
