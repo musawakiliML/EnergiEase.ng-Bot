@@ -89,6 +89,12 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
 
             await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
             
+            
+            # Get Amounts correctly 
+            if payment_platform == "Paystack":
+                paystack_amount = int(amount_paid) / 100
+                amount_paid = paystack_amount
+                
             # Validated amount
             amount = get_order_details['user_amount']
             

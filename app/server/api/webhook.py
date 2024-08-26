@@ -166,7 +166,7 @@ async def process_webhook(request: Request):
                     transaction_id=transaction_id,
                     transaction_status=transaction_status,
                     transaction_reference=transaction_reference,
-                    payment_platform="Paystack",
+                    payment_platform="Fintava",
                     amount_paid=transaction_amount)
 
         return JSONResponse(
