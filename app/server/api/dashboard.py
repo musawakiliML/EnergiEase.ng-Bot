@@ -18,6 +18,12 @@ from app.server.database.crud import (
     update_user_order_transaction
 )
 
+from app.server.bot.message import (
+    order_confirmation_message,
+    order_failed,
+    order_successful
+)
+
 from app.server.auth.auth import authenticate
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
 
