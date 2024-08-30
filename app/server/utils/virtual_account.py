@@ -93,7 +93,7 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             # Get Amounts correctly 
             if payment_platform == "Paystack":
                 paystack_amount = int(amount_paid) / 100
-                amount_paid = paystack_amount
+                amount_paid = int(paystack_amount)
                 
             # Validated amount
             amount = get_order_details['user_amount']
