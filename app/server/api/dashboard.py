@@ -1,4 +1,7 @@
+import os
 from typing import Annotated
+from telegram import Bot
+from dotenv import load_dotenv
 from collections import Counter
 
 from fastapi import APIRouter, status, Depends, Form
@@ -19,6 +22,14 @@ from app.server.auth.auth import authenticate
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
 
 
+# Enable Bot Token
+load_dotenv()
+
+# Telegram bot token
+TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_API"]
+
+
+# Initialize Router
 router = APIRouter()
 
 # User Profile Views
@@ -366,6 +377,13 @@ async def generate_meter_token(user_id: Annotated[str, Form()], user: str = Depe
         # Get User Id
         user_data = await get_single_order_by_id(user_id)
         user_details = user_data["data"]
+        
+        # Creating a Bot Instance to send Order confirmation and Unit Token
+        bot = Bot(token=TELEGRAM_BOT_TOKEN)
+        
+        # Send Order Confirmation Message for buying units
+        user_id = user_details['user_profile']['user_id'] # type: ignore
+
         transaction_id = user_details['transaction_id']
         if user_data.get("message") == "Successful" and user_details['payment_confirmation'] == "PAID":
 
@@ -382,6 +400,13 @@ async def generate_meter_token(user_id: Annotated[str, Form()], user: str = Depe
                 meter_token = buy_meter_unit['meter_token']
                 meter_unit = buy_meter_unit['meter_units']
 
+               
+                await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
+                     meter_number=user_details["user_meter_number"],
+                     meter_unit=meter_unit,
+                     meter_token=meter_token
+                  ), parse_mode="markdown")
+               
                 # Details to update
                 token_data = ["token", meter_token]
                 unit_data = ["units", meter_unit]
