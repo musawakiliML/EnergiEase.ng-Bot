@@ -30,6 +30,7 @@ from app.server.api.webhook import router as Fintava_router
 from app.server.api.dashboard import router as Dashboard_router
 from app.server.api.user import router as User_router
 from app.server.api.paystack import router as Paystack_router
+from app.server.api.whatsapp import router as Whatsapp_router
 
 # Enable Bot Token
 load_dotenv()
@@ -99,16 +100,16 @@ application.add_handler(customer_support)
 # application.add_handler(cancel_command)
 
 # # Set up the webhook
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
-    async with application:
-        await application.start()
-        yield
-        await application.stop()
+# @asynccontextmanager
+# async def lifespan(_: FastAPI):
+#     await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+#     async with application:
+#         await application.start()
+#         yield
+#         await application.stop()
 
-app = FastAPI(lifespan=lifespan)
-# app = FastAPI()
+# app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -118,6 +119,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Declare all routes
+app.include_router(Whatsapp_router, tags=["WhatsApp Webhook"], prefix='/whatsapphook')
 app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
 app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
 app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
