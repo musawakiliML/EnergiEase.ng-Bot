@@ -105,8 +105,8 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             else:
                 if amount_paid == 1000:
                     updated_amount = amount_paid
-                
-                updated_amount = int(amount) - service_fee
+                else:
+                    updated_amount = int(amount) - service_fee
                   
             # Buy Electricity unit
             buy_unit = buy_meter_unit_vtpass(
