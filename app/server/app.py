@@ -100,16 +100,16 @@ application.add_handler(customer_support)
 # application.add_handler(cancel_command)
 
 # Set up the webhook
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
-    async with application:
-        await application.start()
-        yield
-        await application.stop()
+# @asynccontextmanager
+# async def lifespan(_: FastAPI):
+#     await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+#     async with application:
+#         await application.start()
+#         yield
+#         await application.stop()
 
-app = FastAPI(lifespan=lifespan)
-# app = FastAPI()
+# app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,

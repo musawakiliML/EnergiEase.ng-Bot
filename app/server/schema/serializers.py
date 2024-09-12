@@ -35,6 +35,31 @@ def order_serializer(input_data: dict) -> dict:
 
     }
 
+def user_session_serializer(input_data: dict) -> dict:
+    ''' User Session Serializer '''
+    
+    return {
+        "_id": str(input_data["_id"]),
+        "user_profile": input_data["user_profile"],
+        "session_id": input_data["session_id"],
+        "meter_distribution": input_data["meter_distribution"],
+        "user_meter_number": input_data["user_meter_number"],
+        "meter_owner": input_data["meter_owner"],
+        "meter_address": input_data["meter_address"],
+        "user_amount": input_data["user_amount"],
+        "meter_type": input_data["meter_type"],
+        "meter_code": input_data["meter_code"],
+        "token": input_data["token"],
+        "units": input_data["units"],
+        "payment_confirmation": input_data["payment_confirmation"],
+        "unit_confirmation": input_data["unit_confirmation"],
+        "transaction_id": input_data["transaction_id"],
+        "transaction_reference": input_data["transaction_reference"],
+        "order_status": input_data["order_status"],
+        "created_at": str(input_data["created_at"])
+
+    }
+
 
 def meter_details_serializer(input_data: dict) -> dict:
     '''Meter Details Serializer'''

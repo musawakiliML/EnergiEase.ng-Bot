@@ -340,3 +340,31 @@ async def get_meter_details(session_id: str):
             return {"message": "Meter Details not found"}
     except Exception as e:
         return {"message": f"{str(e)}"}
+
+
+
+
+# ================ Session Crud ================= #
+# Create User Session
+
+
+# async def create_user_session(user_order_data: dict):
+#     '''Create an Order'''
+#     try:
+#         order = await energiease_user_order.insert_one(user_order_data)
+#         new_order = await energiease_user_order.find_one({"_id": order.inserted_id})
+#         if new_order:
+#             return order_serializer(new_order)
+#     except Exception as e:
+#         return {"Error in add_user_session": str(e)}
+
+
+# # Get single order
+
+# async def get_single_order(session_id: str):
+#     '''Get Single Order Details'''
+#     user_order = await energiease_user_order.find_one({"session_id": session_id})
+#     if user_order:
+#         return order_serializer(user_order)
+#     else:
+#         return {"message": "not_found"}
