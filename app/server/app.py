@@ -103,33 +103,6 @@ application.add_handler(help_command)
 application.add_handler(customer_support)
 # application.add_handler(cancel_command)
 
-# Set up the webhook
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
-    async with application:
-        await application.start()
-        yield
-        await application.stop()
-
-app = FastAPI(lifespan=lifespan)
-# app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Declare all routes
-app.include_router(Whatsapp_router, tags=["WhatsApp Webhook"], prefix='/whatsapphook')
-app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
-app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
-app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
-app.include_router(User_router, tags=['User Authentication'], prefix='/user')
-
 
 # Render Background Tasks
 RENDER_URL = "https://energiease-ng-bot.onrender.com"
@@ -148,10 +121,45 @@ async def keep_alive_task():
         await reload_website()
         await asyncio.sleep(RELOAD_INTERVAL)
 
-@app.on_event("startup")
-async def startup_event():
-    # Start the background task that will keep the Render app alive
-    asyncio.create_task(keep_alive_task())
+# Set up the webhook
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    
+    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+    async with application:
+        await application.start()
+        
+        # Start the background task to keep the Render app alive
+        keep_alive = asyncio.create_task(keep_alive_task())
+        
+        yield
+        
+        await application.stop()
+        
+        # Clean up: Stop the Telegram bot and cancel the keep-alive task
+        keep_alive.cancel()
+        try:
+            await keep_alive
+        except asyncio.CancelledError:
+            print("Keep-alive task cancelled during shutdown.")
+
+app = FastAPI(lifespan=lifespan)
+# app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Declare all routes
+app.include_router(Whatsapp_router, tags=["WhatsApp Webhook"], prefix='/whatsapphook')
+app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
+app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
+app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
+app.include_router(User_router, tags=['User Authentication'], prefix='/user')
 
 
 # Configure telegram bot webhook
