@@ -2,6 +2,10 @@ import os
 import logging
 from dotenv import load_dotenv
 
+import httpx
+import asyncio
+from datetime import datetime
+
 from telegram.ext import Application, ContextTypes
 
 from telegram import Update
@@ -20,7 +24,7 @@ from app.server.bot.message import *
 # Import Chatbot handlers
 from app.server.bot.handlers import *
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -100,16 +104,16 @@ application.add_handler(customer_support)
 # application.add_handler(cancel_command)
 
 # Set up the webhook
-# @asynccontextmanager
-# async def lifespan(_: FastAPI):
-#     await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
-#     async with application:
-#         await application.start()
-#         yield
-#         await application.stop()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+    async with application:
+        await application.start()
+        yield
+        await application.stop()
 
-# app = FastAPI(lifespan=lifespan)
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
+# app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -125,6 +129,29 @@ app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavaweb
 app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
 app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
 app.include_router(User_router, tags=['User Authentication'], prefix='/user')
+
+
+# Render Background Tasks
+RENDER_URL = "https://energiease-ng-bot.onrender.com"
+RELOAD_INTERVAL = 10 # Interval in seconds (15 minutes)
+
+async def reload_website():
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(RENDER_URL)
+            print(f"Reloaded at {datetime.utcnow().isoformat()}: Status Code {response.status_code}")
+        except Exception as e:
+            print(f"Error reloading at {datetime.utcnow().isoformat()}: {str(e)}")
+
+async def keep_alive_task():
+    while True:
+        await reload_website()
+        await asyncio.sleep(RELOAD_INTERVAL)
+
+@app.on_event("startup")
+async def startup_event():
+    # Start the background task that will keep the Render app alive
+    asyncio.create_task(keep_alive_task())
 
 
 # Configure telegram bot webhook
