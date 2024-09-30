@@ -106,7 +106,7 @@ application.add_handler(customer_support)
 
 # Render Background Tasks
 RENDER_URL = "https://energiease-ng-bot.onrender.com/"
-RELOAD_INTERVAL = 10 # Interval in seconds (15 minutes)
+RELOAD_INTERVAL = 600 # Interval in seconds (15 minutes)
 
 async def reload_website():
     async with httpx.AsyncClient() as client:
