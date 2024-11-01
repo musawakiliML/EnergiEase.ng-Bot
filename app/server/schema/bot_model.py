@@ -73,6 +73,11 @@ class UserSessionSchema(BaseModel):
     # Union[str, None]
     user_profile: UserProfileSchema
     session_id: str | None
+    user_phone_number: str | None
+    entry_message: str | None
+    user_input_1: str | None
+    user_input_2: str | None
+    user_confirm: str | None
     meter_distribution: str | None
     user_meter_number: str | None
     user_amount: str | None
@@ -93,6 +98,11 @@ class UserSessionSchema(BaseModel):
                 "id": "668ee347405be690b5693300",
                 "userprofile": {},
                 "session_id": "a2324d70872b",
+                "user_phone_number": "0990767655542",
+                "entry_message": "",
+                "user_input_1":"",
+                "user_input_2":"",
+                "user_confirm":"",
                 "meter_distribution": "",
                 "user_meter_number": "",
                 "user_amount": "",

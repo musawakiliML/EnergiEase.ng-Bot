@@ -1,3 +1,4 @@
+from email import message
 import os
 from uuid6 import uuid7
 from telegram import Bot
@@ -7,17 +8,22 @@ from app.server.utils.api_config import *
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
 from app.server.database.crud import (get_single_order_transaction,
                                       update_user_order,
-                                      update_user_order_transaction)
+                                      update_user_order_transaction,
+                                      get_single_session,
+                                      delete_user_session)
 
 from app.server.bot.message import (
     order_confirmation_message,
     order_failed,
     order_successful
 )
-# from app.server.utils.monnify_payment import (
-#     init_bank_transfer,
-#     init_transaction
-# )
+
+from app.server.bot.whatsapp_messages import (
+    order_confirmation,
+    order_failed_whatsapp,
+    order_successful_whatsapp
+)
+from app.server.utils.whatsapp import send_whatsapp_message
 
 fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 
@@ -83,11 +89,21 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
         bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
         if transaction_status == "PAID" and get_order_details['transaction_id'] == transaction_id:
+            
+            numeric_value = all(value.isnumeric() for value in get_order_details['session_id'])
+            
+            # Check for whatsapp or telegram session
+            if numeric_value is True:
+                # Send Order Confirmation Message whatsapp
+                user_phone_number = await get_single_session(get_order_details['session_id'])
+                message = order_confirmation(order_id=order_id)
+                
+                send_whatsapp_message(user_phone_number['user_phone_number'], message)
+            else:
+                # Send Order Confirmation Message telegram
+                user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-            # Send Order Confirmation Message
-            user_id = get_order_details['user_profile']['user_id'] # type: ignore
-
-            await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
+                await bot.send_message(chat_id=user_id, text=order_confirmation_message(order_id=order_id)) # type: ignore
             
             
             # Get Amounts correctly 
@@ -128,34 +144,61 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
                 meter_token = buy_unit['meter_token']
                 meter_unit = buy_unit['meter_units']
 
-                # Send Order Confirmation Message for buying units
-                user_id = get_order_details['user_profile']['user_id'] # type: ignore
+                # Check for whatsapp or telegram session
+                if numeric_value is True:
+                    # Send Order Confirmation message for Buying units to whatsapp
+                    user_phone_number = await get_single_session(get_order_details['session_id'])
+                    message = order_successful_whatsapp(
+                        meter_number=get_order_details["user_meter_number"],
+                        meter_unit=meter_unit,
+                        meter_token=meter_token
+                    )
+                    
+                    send_whatsapp_message(user_phone_number['user_phone_number'], message)
+                else:
+                    # Send Order Confirmation Message for buying units to telegram
+                    user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-                await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
-                    meter_number=get_order_details["user_meter_number"],
-                    meter_unit=meter_unit,
-                    meter_token=meter_token
-                ), parse_mode="markdown"
-                )
+                    await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
+                        meter_number=get_order_details["user_meter_number"],
+                        meter_unit=meter_unit,
+                        meter_token=meter_token
+                    ), parse_mode="markdown"
+                    )
+                    
                 # Update Database
                 token_data = ["token", meter_token]
                 unit_data = ["units", meter_unit]
                 unit_confirmation = ["unit_confirmation", "SUCCESSFUL"]
                 order_status = ["order_status", "COMPLETED"]
+                
                 # transaction_id = transaction_reference
                 await update_user_order_transaction(token_data, transaction_id)
                 await update_user_order_transaction(unit_data, transaction_id)
                 await update_user_order_transaction(unit_confirmation, transaction_id)
                 await update_user_order_transaction(order_status, transaction_id)
+                
+                # Delete user session on whatsapp
+                await delete_user_session(get_order_details['session_id'])
                 return buy_unit
             else:
-                # Send Order Failed Message
-                user_id = get_order_details['user_profile']['user_id'] # type: ignore
+                # Check for whatsapp or telegram session
+                if numeric_value is True:
+                    # Send Order Failed Message to Whatsapp
+                    user_phone_number = await get_single_session(get_order_details['session_id'])
+                    message = order_failed_whatsapp(
+                        order_id=order_id
+                    )
+                    send_whatsapp_message(user_phone_number['user_phone_number'], message)
+                    
+                else:
+                    # Send Order Failed Message to Telegram
+                    user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-                await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
-                    order_id=order_id
-                ), parse_mode="markdown"
-                )
+                    await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
+                        order_id=order_id
+                    ), parse_mode="markdown"
+                    )
                 
                 # Update Database
                 unit_confirmation = ["unit_confirmation", "FAILED"]
@@ -165,18 +208,33 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
                 await update_user_order_transaction(unit_confirmation, transaction_id)
                 await update_user_order_transaction(order_status, transaction_id)
                 
+                # Delete user session on whatsapp
+                await delete_user_session(get_order_details['session_id'])
+                
                 return {
                     "status": "400",
                     "message": "Error Occured!"
                 }
         else:
-            # Send Order Failed Message
-            user_id = get_order_details['user_profile']['user_id'] # type: ignore
+            # Check for whatsapp or telegram session
+            numeric_value = all(value.isnumeric() for value in get_order_details['session_id'])
+            
+            if numeric_value is True:
+                # Send Order Failed Message to Whatsapp
+                user_phone_number = await get_single_session(get_order_details['session_id'])
+                message = order_failed_whatsapp(
+                    order_id=order_id
+                )
+                send_whatsapp_message(user_phone_number['user_phone_number'], message)
+            else:
+                
+                # Send Order Failed Message on Telegram
+                user_id = get_order_details['user_profile']['user_id'] # type: ignore
 
-            await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
-                order_id=order_id
-            ), parse_mode="markdown"
-            )
+                await bot.send_message(chat_id=user_id, text=order_failed( # type: ignore
+                    order_id=order_id
+                ), parse_mode="markdown"
+                )
             
             # Update Database
             unit_confirmation = ["unit_confirmation", "FAILED"]
@@ -185,6 +243,9 @@ async def verify_payment_buy_unit(transaction_id, transaction_status, transactio
             transaction_id = transaction_reference
             await update_user_order_transaction(unit_confirmation, transaction_id)
             await update_user_order_transaction(order_status, transaction_id)
+            
+            # Delete user session on whatsapp
+            await delete_user_session(get_order_details['session_id'])
             
             return {
                 "status": "400",

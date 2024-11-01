@@ -1,18 +1,21 @@
 from bson.objectid import ObjectId
+from requests import session
 
 from app.server.database.config import (
     energiease_user_profile,
     energiease_user_order,
+    energiease_session_details,
     energiease_meter_details,
     energiease_user_details,
-    )
+)
 
 from app.server.schema.serializers import (
     user_profile_serializer,
     order_serializer,
     meter_details_serializer,
     user_details_serializer,
-    )
+    user_session_serializer
+)
 
 
 # ================ Order Crud ================= #
@@ -342,29 +345,55 @@ async def get_meter_details(session_id: str):
         return {"message": f"{str(e)}"}
 
 
-
-
 # ================ Session Crud ================= #
 # Create User Session
 
+async def create_user_session(user_session_data: dict):
+    '''Create an Order'''
+    try:
+        session = await energiease_session_details.insert_one(user_session_data)
+        new_session = await energiease_session_details.find_one({"_id": session.inserted_id})
 
-# async def create_user_session(user_order_data: dict):
-#     '''Create an Order'''
-#     try:
-#         order = await energiease_user_order.insert_one(user_order_data)
-#         new_order = await energiease_user_order.find_one({"_id": order.inserted_id})
-#         if new_order:
-#             return order_serializer(new_order)
-#     except Exception as e:
-#         return {"Error in add_user_session": str(e)}
+        if new_session:
+            return user_session_serializer(new_session)
+
+    except Exception as e:
+        return {"Error in Creating user session": str(e)}
 
 
-# # Get single order
+# Get Single Session
 
-# async def get_single_order(session_id: str):
-#     '''Get Single Order Details'''
-#     user_order = await energiease_user_order.find_one({"session_id": session_id})
-#     if user_order:
-#         return order_serializer(user_order)
-#     else:
-#         return {"message": "not_found"}
+async def get_single_session(session_id: str):
+    '''Get Single Session Details'''
+
+    user_session = await energiease_session_details.find_one({"session_id": session_id})
+    if user_session:
+        return user_session_serializer(user_session)
+    else:
+        return {"message": "not_found"}
+
+# Delete User Session
+
+
+async def delete_user_session(session_id: str):
+    '''Delete Single Session'''
+    await energiease_session_details.delete_one({'session_id': session_id})
+    return {"Message":"Session Deleted Successfully!"}
+
+
+# Update User session
+
+async def update_user_session(user_session_data: list, session_id: str):
+    try:
+
+        updated_user_session = await energiease_session_details.update_one({"session_id":session_id}, {"$set":{user_session_data[0]:user_session_data[1]}})
+        updated_session = await energiease_session_details.find_one({"session_id":session_id})
+
+        if updated_user_session:
+            # print(updated_session)
+            return user_session_serializer(updated_session) # type: ignore
+        else:
+            return {"Message":f'No post with this id: {id} found'}
+    except Exception as e:
+        print(f"Error in update_user_session: {str(e)}")
+    
