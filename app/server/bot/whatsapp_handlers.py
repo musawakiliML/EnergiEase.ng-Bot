@@ -342,6 +342,17 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         # Update user Session
                                         await update_user_session(["meter_owner", meter_owner], phoneid)
                                         await update_user_session(["meter_address", meter_address], phoneid)
+                                        
+                                        message = order_summary(
+                                        meter_owner,
+                                        data["user_amount"],  # type: ignore
+                                        
+                                        data["user_meter_number"], # type: ignore
+                                        data["meter_type"],  # type: ignore
+                                        meter_address
+                                    )
+
+                                        send_whatsapp_message(phonenumber, message)
                                     else:
                                         # Create a Failed Order and Delete Session
 
@@ -378,17 +389,6 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         send_whatsapp_message(
                                             phonenumber, message)
                                         await delete_user_session(phoneid)
-
-                                    message = order_summary(
-                                        meter_owner,
-                                        data["user_amount"],  # type: ignore
-                                        
-                                        data["user_meter_number"], # type: ignore
-                                        data["meter_type"],  # type: ignore
-                                        meter_address
-                                    )
-
-                                    send_whatsapp_message(phonenumber, message)
                                 else:
 
                                     message = "Oops 😓 ❗Please enter an amount not below 1000:"
