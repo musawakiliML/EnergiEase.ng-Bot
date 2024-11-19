@@ -19,7 +19,7 @@ from telegram.ext import (
 from app.server.bot.message import *
 
 # Get Account Creation Modules and Electricity bills
-from app.server.utils.virtual_account import *
+from app.server.utils.virtual_account import *   # type: ignore
 from app.server.utils.vtpass_utils import (
     get_meter_details_vtpass
     )

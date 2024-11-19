@@ -24,6 +24,9 @@ from app.server.bot.message import (
     order_successful
 )
 
+from app.server.utils.whatsapp import send_whatsapp_message
+from app.server.bot.whatsapp_messages import order_confirmation
+
 from app.server.auth.auth import authenticate
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
 
@@ -378,10 +381,10 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
 # Generate Meter token
 
 @router.post("/generate_meter_token", response_description="Generate Meter Token")
-async def generate_meter_token(user_id: Annotated[str, Form()], user: str = Depends(authenticate)):
+async def generate_meter_token(order_id: Annotated[str, Form()], user: str = Depends(authenticate)):
     try:
         # Get User Id
-        user_data = await get_single_order_by_id(user_id)
+        user_data = await get_single_order_by_id(order_id)
         user_details = user_data["data"]
         
         # Creating a Bot Instance to send Order confirmation and Unit Token
@@ -389,6 +392,9 @@ async def generate_meter_token(user_id: Annotated[str, Form()], user: str = Depe
         
         # Send Order Confirmation Message for buying units
         user_id = user_details['user_profile']['user_id'] # type: ignore
+        
+        # Check Whatsapp or Telegram Session
+        numeric_value = all(value.isnumeric() for value in user_details['session_id'])
 
         transaction_id = user_details['transaction_id']
         if user_data.get("message") == "Successful" and user_details['payment_confirmation'] == "PAID":
@@ -406,12 +412,19 @@ async def generate_meter_token(user_id: Annotated[str, Form()], user: str = Depe
                 meter_token = buy_meter_unit['meter_token']
                 meter_unit = buy_meter_unit['meter_units']
 
-               
-                await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
-                     meter_number=user_details["user_meter_number"],
-                     meter_unit=meter_unit,
-                     meter_token=meter_token
-                  ), parse_mode="markdown")
+                if numeric_value is True:
+                    
+                    # Send Order Confirmation Message whatsapp
+                    user_phone_number = "+" + str(user_details['session_id']).strip()
+                    message = order_confirmation(order_id=order_id)
+                    
+                    send_whatsapp_message(user_phone_number, message)
+                else:
+                    await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
+                        meter_number=user_details["user_meter_number"],
+                        meter_unit=meter_unit,
+                        meter_token=meter_token
+                    ), parse_mode="markdown")
                
                 # Details to update
                 token_data = ["token", meter_token]
