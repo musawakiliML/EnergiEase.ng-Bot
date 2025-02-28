@@ -1,4 +1,5 @@
 import os
+from re import M
 from typing import Annotated
 from telegram import Bot
 from dotenv import load_dotenv
@@ -25,7 +26,7 @@ from app.server.bot.message import (
 )
 
 from app.server.utils.whatsapp import send_whatsapp_message
-from app.server.bot.whatsapp_messages import order_confirmation
+from app.server.bot.whatsapp_messages import order_successful_whatsapp
 
 from app.server.auth.auth import authenticate
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
@@ -230,9 +231,9 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                 # Total Amount Of Units Purchased
                 if order["user_amount"] and order['payment_confirmation'] == "PAID":
                     total_amount_of_units_purchased += order["user_amount"]
-
                 # Total Number of Units Purchased
                 if order['payment_confirmation'] == "PAID" and order["unit_confirmation"] == "SUCCESSFUL":
+                    # units = str(order['units'])
                     total_number_of_units_purchased += float(order['units'])
 
                 # Most Purchasing Meter (Top 3)
@@ -243,6 +244,7 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                 # Most Purchasing User (Top 3)
                 if order['user_profile']['full_name'] and order["unit_confirmation"] == "SUCCESSFUL":
                     user_counter[order['user_profile']['full_name']] += 1
+                    print(user_counter)
 
                 # Successful/Failed/Not Completed Payment
                 if order['payment_confirmation'] == "PAID":
@@ -259,7 +261,7 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                     failed_units += 1
                 else:
                     not_completed_units += 1
-
+                
                 # Sucessful/Failed/Not Completed Order
                 if order['order_status'] == "COMPLETED":
                     successful_orders += 1
@@ -267,18 +269,18 @@ async def dashboard_analytics(user: str = Depends(authenticate)):
                     failed_orders += 1
                 else:
                     not_completed_orders += 1
-
+                
                 # Successful/Failed/Not Completed distribution summary
                 if order['meter_distribution'] and order['unit_confirmation'] == "SUCCESSFUL":
-                    distro_success_counter[order['meter_distribution']] += 1
+                    distro_success_counter[order['meter_distribution']] += 1 
                 elif order['unit_confirmation'] == "FAILED":
                     distro_failed_counter[order['meter_distribution']] += 1
                 else:
                     distro_not_completed_counter[order['meter_distribution']] += 1
-
+             
             # Most Purchased Distribution (Top 3)
             most_purchased_distribution = distribution.most_common(3)
-
+            
             most_purchasing_meter = meter_counter.most_common(3)
 
             most_purchasing_user = user_counter.most_common(3)
@@ -386,15 +388,16 @@ async def generate_meter_token(order_id: Annotated[str, Form()], user: str = Dep
         # Get User Id
         user_data = await get_single_order_by_id(order_id)
         user_details = user_data["data"]
-        
+
         # Creating a Bot Instance to send Order confirmation and Unit Token
         bot = Bot(token=TELEGRAM_BOT_TOKEN)
-        
+
         # Send Order Confirmation Message for buying units
-        user_id = user_details['user_profile']['user_id'] # type: ignore
-        
+        user_id = user_details['user_profile']['user_id']  # type: ignore
+
         # Check Whatsapp or Telegram Session
-        numeric_value = all(value.isnumeric() for value in user_details['session_id'])
+        numeric_value = all(value.isnumeric()
+                            for value in user_details['session_id'])
 
         transaction_id = user_details['transaction_id']
         if user_data.get("message") == "Successful" and user_details['payment_confirmation'] == "PAID":
@@ -413,19 +416,22 @@ async def generate_meter_token(order_id: Annotated[str, Form()], user: str = Dep
                 meter_unit = buy_meter_unit['meter_units']
 
                 if numeric_value is True:
-                    
-                    # Send Order Confirmation Message whatsapp
-                    user_phone_number = "+" + str(user_details['session_id']).strip()
-                    message = order_confirmation(order_id=order_id)
-                    
+
+                    # Send Order Successfull Message whatsapp
+                    user_phone_number = "+" + \
+                        str(user_details['session_id']).strip()
+                    message = order_successful_whatsapp(meter_unit=meter_unit,
+                                                        meter_number=user_details['user_meter_number'],
+                                                        meter_token=meter_token)
+
                     send_whatsapp_message(user_phone_number, message)
                 else:
-                    await bot.send_message(chat_id=user_id, text=order_successful( # type: ignore
+                    await bot.send_message(chat_id=user_id, text=order_successful(  # type: ignore
                         meter_number=user_details["user_meter_number"],
                         meter_unit=meter_unit,
                         meter_token=meter_token
                     ), parse_mode="markdown")
-               
+
                 # Details to update
                 token_data = ["token", meter_token]
                 unit_data = ["units", meter_unit]

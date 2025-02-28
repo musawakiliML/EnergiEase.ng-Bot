@@ -33,7 +33,6 @@ from app.server.database.crud import (
     create_user_profile,
     update_user_order,
     create_meter_details,
-    get_meter_details,
     update_meter_details
     )
 
@@ -90,7 +89,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             user_profile = user_profile
 
             # logger.info(f"{user_profile}")
-    except:
+    except Exception:
         # Create User Profile
         user_profile_data = {
             "username": username,

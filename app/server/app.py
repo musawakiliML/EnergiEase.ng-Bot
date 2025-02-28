@@ -35,6 +35,7 @@ from app.server.api.dashboard import router as Dashboard_router
 from app.server.api.user import router as User_router
 from app.server.api.paystack import router as Paystack_router
 from app.server.api.whatsapp import router as Whatsapp_router
+from app.server.api.whatsappflows import router as Whatsapp_flow_router
 
 # Enable Bot Token
 load_dotenv()
@@ -51,10 +52,10 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-# Set the webhook path to the route you want to handle updates
+# Webhook path to the route to handle updates
 WEBHOOK_PATH = "/telegram"
 
-# URL of your FastAPI server
+# URL of FastAPI server
 if os.environ['DEBUG'] == "True":
     WEBHOOK_URL_STAGING = "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
 elif os.environ['DEBUG'] == "False":
@@ -122,29 +123,29 @@ async def keep_alive_task():
         await asyncio.sleep(RELOAD_INTERVAL)
 
 # Set up the webhook
-@asynccontextmanager
-async def lifespan(_: FastAPI):
+# @asynccontextmanager
+# async def lifespan(_: FastAPI):
     
-    await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
-    async with application:
-        await application.start()
+#     await application.bot.set_webhook(WEBHOOK_URL_PRODUCTION, allowed_updates=Update.ALL_TYPES)
+#     async with application:
+#         await application.start()
         
-        # Start the background task to keep the Render app alive
-        keep_alive = asyncio.create_task(keep_alive_task())
+#         # Start the background task to keep the Render app alive
+#         keep_alive = asyncio.create_task(keep_alive_task())
         
-        yield
+#         yield
         
-        await application.stop()
+#         await application.stop()
         
-        # Clean up: Stop the Telegram bot and cancel the keep-alive task
-        keep_alive.cancel()
-        try:
-            await keep_alive
-        except asyncio.CancelledError:
-            print("Keep-alive task cancelled during shutdown.")
+#         # Clean up: Stop the Telegram bot and cancel the keep-alive task
+#         keep_alive.cancel()
+#         try:
+#             await keep_alive
+#         except asyncio.CancelledError:
+#             print("Keep-alive task cancelled during shutdown.")
 
-app = FastAPI(lifespan=lifespan)
-# app = FastAPI()
+# app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -156,6 +157,7 @@ app.add_middleware(
 
 # Declare all routes
 app.include_router(Whatsapp_router, tags=["WhatsApp Webhook"], prefix='/whatsapphook')
+app.include_router(Whatsapp_flow_router, tags=['WhatsApp Flow Webhooks'], prefix='/whatsappflow')
 app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
 app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
 app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')

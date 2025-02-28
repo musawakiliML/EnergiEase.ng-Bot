@@ -35,3 +35,24 @@ app.server.utils.vtpass_utils - INFO - {'code': '000', 'content': {'transactions
 
 
  {'code': '000', 'content': {'transactions': {'status': 'delivered', 'product_name': 'Abuja Electricity Distribution Company- AEDC', 'unique_element': '07162833334', 'unit_price': 3900, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': '46.80', 'total_amount': 3853.2, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 3900, 'platform': 'api', 'method': 'api', 'transactionId': '17305017619314921235958456'}}, 'response_description': 'TRANSACTION SUCCESSFUL', 'requestId': '202411012355e9a7f1d3d782', 'amount': '3900.00', 'transaction_date': {'date': '2024-11-01 22:56:02.000000', 'timezone_type': 2, 'timezone': 'Z'}, 'purchased_code': 'Token : token: 67878617610674297422', 'MeterNumber': '07162833334', 'Token': 'token: 67878617610674297422', 'ReceiptNumber': '7002202411019248216', 'PurchasedUnits': 17.3, 'DebtDescription': None, 'DebtAmount': None, 'RefundUnits': None, 'ServiceChargeVatExcl': 3627.91, 'Name': 'E.D.(D&M) NEPA-HQ  ', 'Address': 'E.D.(D&M) NEPA-HQ   - PrepaidCommercial 1PH 3PH - Band A', 'Reference': '67878617610674297422', 'Vat': 272.09, 'ResponseTime': None, 'TariffRate': 'PrepaidCommercial 1PH 3PH - Band A', 'FreeUnits': None, 'MeterCategory': 'Kwh', 'UtilityAmountVatExcl': None}
+
+def format_token_with_dashes(token: str) -> str:
+    """Format a meter token by adding dashes every 4 characters.
+    
+    Args:
+        token (str): The raw meter token string
+        
+    Returns:
+        str: The formatted token with dashes (e.g. "1234-5678-9012-3456")
+    """
+    # Remove any existing spaces or dashes
+    clean_token = token.replace(" ", "").replace("-", "")
+    
+    # Split into groups of 4 and join with dashes
+    groups = [clean_token[i:i+4] for i in range(0, len(clean_token), 4)]
+    formatted_token = "-".join(groups)
+    
+    return formatted_token
+
+
+

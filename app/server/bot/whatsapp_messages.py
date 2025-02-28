@@ -42,7 +42,7 @@ def order_payment(amount: str, accountnumber: str, accountname: str, bankname: s
 
 
 def order_confirmation(order_id: str):
-    message = f"Fantastic!! Your order has been recieved.✅\n\n\tOrder Id:*{order_id}*\n⌛ We are processing it."
+    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id:*{order_id}*\n⌛ We are processing it."
 
     return message
 
