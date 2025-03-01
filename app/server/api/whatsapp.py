@@ -76,9 +76,9 @@ async def energieasebot_webhook(request: Request):
                     profile_name = response["entry"][0]["changes"][0]["value"][
                         "contacts"
                     ][0]["profile"]["name"]
-                    phone_id = response["entry"][0]["changes"][0]["value"]["metadata"][
-                        "phone_number_id"
-                    ]
+                    phone_id = response["entry"][0]["changes"][0]["value"]["contacts"][
+                        0
+                    ]["wa_id"]
                     from_id = response["entry"][0]["changes"][0]["value"]["messages"][
                         0
                     ]["from"]
