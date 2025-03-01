@@ -47,6 +47,11 @@ def order_payment(amount: str, accountnumber: str, accountname: str, bankname: s
     return message
 
 
+def order_payment_updated(amount: str, accountnumber: str, accountname: str, bankname: str):
+    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number: {accountnumber}\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇\n\n ⌛ Your request would be processed automatically once we received your payment.\n\n To Cancel Order Reply with 'Q'"
+
+    return message
+
 def order_confirmation(order_id: str):
     message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id:*{order_id}*\n⌛ We are processing it."
 
@@ -65,7 +70,7 @@ def order_failed_whatsapp(order_id: str):
 
 
 def customer_support():
-    message = f"Welcome to Customer Support. Please drop your issue here 👉 https://chat.whatsapp.com/DilpQXeB6nJ3BZ169dl3l3"
+    message = "Welcome to Customer Support. Please drop your issue here 👉 https://chat.whatsapp.com/DilpQXeB6nJ3BZ169dl3l3"
     return message
 
 

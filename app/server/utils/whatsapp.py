@@ -234,3 +234,33 @@ def send_confirm_order_message(phone_number: str, body_text: str) -> dict:
         os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
+
+# Send Payment Link and Payment Details
+def send_call_to_action_payment_whatsapp(
+    phone_number: str, body_text: str, transaction_url: str | None
+) -> dict:
+
+    headers = {
+        "Authorization": os.environ["WHATSAPP_TOKEN"],
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": phone_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "cta_url",
+            "header": {"type": "text", "text": "Order Payment Details!"},
+            "body": {"text": body_text},
+            "action": {
+                "name": "cta_url",
+                "parameters": {"display_text": "Pay Now", "url": transaction_url},
+            },
+        },
+    }
+    response = requests.post(
+        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response_json = response.json()
+    return response_json
