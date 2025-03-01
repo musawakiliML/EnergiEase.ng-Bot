@@ -1,17 +1,15 @@
 # Webhook For Transaction Nofication
-import logging
 import hashlib
-import json
 import hmac
+import logging
 import os
 
+from dotenv import load_dotenv
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
-from dotenv import load_dotenv
 
-from app.server.api import paystack
-from app.server.utils.virtual_account import verify_payment_buy_unit
 from app.server.database.crud import update_user_order_transaction
+from app.server.utils.virtual_account import verify_payment_buy_unit
 
 load_dotenv()
 
@@ -26,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-monnify_secret_key = os.environ['MONNIFY_SECRET_KEY']
-monnify_ip = os.environ['MONNIFY_IP']
+monnify_secret_key = os.environ["MONNIFY_SECRET_KEY"]
+monnify_ip = os.environ["MONNIFY_IP"]
 
 # ============ Monnify Webhook ================================
 
@@ -125,81 +123,81 @@ def verify_monnify_webhook(payload_in_bytes, monnify_hash, headers):
 #         return JSONResponse(
 #             content={"status": "success", "msg": "Webhook received successfully"}, status_code=status.HTTP_200_OK)
 
+
 @router.post("/", status_code=status.HTTP_200_OK)
 async def process_webhook(request: Request):
-    '''Webhook for virtual account funding'''
+    """Webhook for virtual account funding"""
     try:
 
         request_body = await request.json()
 
-        if request_body['event'] == "VIRTUAL_WALLET_PAYMENT":
+        if request_body["event"] == "VIRTUAL_WALLET_PAYMENT":
             transaction_details = request_body
 
             logger.info(request_body)
-            
 
             # Check Transaction Details
-            if transaction_details['data']['status'] == "PAID": #and transaction_details['data']['paymentStatus'] == "PAID":
-                transaction_reference = transaction_details['data']['merchantReference']
-                transaction_status = transaction_details['data']['status'] #['paymentStatus']
-                transaction_id = transaction_details['data']['id']
-                transaction_amount = transaction_details['data']['amountPaid']
+            if (
+                transaction_details["data"]["status"] == "PAID"
+            ):  # and transaction_details['data']['paymentStatus'] == "PAID":
+                transaction_reference = transaction_details["data"]["merchantReference"]
+                transaction_status = transaction_details["data"][
+                    "status"
+                ]  # ['paymentStatus']
+                transaction_id = transaction_details["data"]["id"]
+                transaction_amount = transaction_details["data"]["amountPaid"]
 
                 user_order_data = ["payment_confirmation", transaction_status]
 
                 await update_user_order_transaction(user_order_data, transaction_id)
-                await update_user_order_transaction(["transaction_reference", transaction_reference], transaction_id)
-
-                await verify_payment_buy_unit(transaction_id=transaction_id,
-                                              transaction_status=transaction_status,
-                                              transaction_reference=transaction_reference,
-                                              payment_platform="Fintava",
-                                              amount_paid=transaction_amount)
-
-            else:
-                transaction_id = transaction_details['data']['id']
-                transaction_reference = transaction_details['data']['merchantReference']
-                transaction_status = transaction_details['data']['status']
-                transaction_amount = transaction_details['data']['amountPaid']
+                await update_user_order_transaction(
+                    ["transaction_reference", transaction_reference], transaction_id
+                )
 
                 await verify_payment_buy_unit(
                     transaction_id=transaction_id,
                     transaction_status=transaction_status,
                     transaction_reference=transaction_reference,
                     payment_platform="Fintava",
-                    amount_paid=transaction_amount)
+                    amount_paid=transaction_amount,
+                )
+
+            else:
+                transaction_id = transaction_details["data"]["id"]
+                transaction_reference = transaction_details["data"]["merchantReference"]
+                transaction_status = transaction_details["data"]["status"]
+                transaction_amount = transaction_details["data"]["amountPaid"]
+
+                await verify_payment_buy_unit(
+                    transaction_id=transaction_id,
+                    transaction_status=transaction_status,
+                    transaction_reference=transaction_reference,
+                    payment_platform="Fintava",
+                    amount_paid=transaction_amount,
+                )
 
         return JSONResponse(
-            content={"status": "success",
-                     "message": "Webhook received successfully"},
+            content={"status": "success", "message": "Webhook received successfully"},
             status_code=status.HTTP_200_OK,
         )
     except Exception:
         return {
-            "status": request_body['data']['status'],
-            "message": request_body['data']['message']
+            "status": request_body["data"]["status"],
+            "message": request_body["data"]["message"],
         }
-
 
 
 # Cron Job to Keep the Server Alive
 @router.get("/cronjob/")
 async def bot_cron_job():
     try:
-        response_body = {
-            'message': "Successfull",
-            'status': status.HTTP_200_OK
-        }
-        return JSONResponse(
-            content=response_body,
-            status_code=status.HTTP_200_OK
-            )
-    except Exception as e:
+        response_body = {"message": "Successfull", "status": status.HTTP_200_OK}
+        return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
+    except Exception:
         return JSONResponse(
             content={
-                'message': "Failed",
-                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+                "message": "Failed",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             },
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-

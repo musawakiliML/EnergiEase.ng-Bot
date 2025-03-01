@@ -1,38 +1,22 @@
 import json
 from datetime import datetime
 from typing import Annotated
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    status,
-    Form,
-    UploadFile,
-    Body,
-    Depends
-    )
 
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, UploadFile, status
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
+from app.server.auth.auth import authenticate
 from app.server.auth.hash_password import HashPassword
-from app.server.utils.supabase_util import upload_to_supabase
-from app.server.database.crud import (
-    get_user_by_id,
-    create_user,
-    update_user_by_id,
-    get_user_by_email
-    )
-
-from app.server.schema.user_model import UserUpdateSchema
 from app.server.auth.jwt_handler import (
     create_access_token,
+    create_refresh_token,
     verify_access_token,
-    create_refresh_token
-    )
-
-from app.server.auth.auth import authenticate
-
+)
+from app.server.database.crud import create_user, get_user_by_email
+from app.server.schema.user_model import UserUpdateSchema
+from app.server.utils.supabase_util import upload_to_supabase
 
 router = APIRouter()
 
@@ -44,43 +28,41 @@ hash_password = HashPassword()
 # Login View
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_description="User Login")
+@router.post(
+    "/login", status_code=status.HTTP_200_OK, response_description="User Login"
+)
 async def login_view(user: OAuth2PasswordRequestForm = Depends()):
     try:
-        
+
         user_data = await get_user_by_email(email=user.username)
-        
-        if user_data.get('message') == "Successful":
-            user_details = user_data.get('data')
+
+        if user_data.get("message") == "Successful":
+            user_details = user_data.get("data")
             # type: ignore
-            
-            if hash_password.verify_hash(user.password, user_details['password']): # type: ignore
+
+            if hash_password.verify_hash(user.password, user_details["password"]):  # type: ignore
                 access_token = create_access_token(
-                    user_details['email_address']  # type: ignore
+                    user_details["email_address"]  # type: ignore
                 )
-                
+
                 refresh_token = create_refresh_token(
-                    {"user": user_details['email_address']})  # type: ignore
-                
+                    {"user": user_details["email_address"]}  # type: ignore
+                )  # type: ignore
+
                 response = {
                     "access_token": access_token,
                     "refresh_token": refresh_token,
-                    "token_type": "Bearer"
+                    "token_type": "Bearer",
                 }
 
-                return JSONResponse(
-                    content=response,
-                    status_code=status.HTTP_200_OK
-                )
-    except Exception as e:
+                return JSONResponse(content=response, status_code=status.HTTP_200_OK)
+    except Exception:
         response = {
             "message": "User Doesn't Exist",
-            "status": status.HTTP_401_UNAUTHORIZED
+            "status": status.HTTP_401_UNAUTHORIZED,
         }
-        return JSONResponse(
-            content=response,
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        return JSONResponse(content=response, status_code=status.HTTP_401_UNAUTHORIZED)
+
 
 # Refresh Token
 
@@ -89,13 +71,12 @@ async def login_view(user: OAuth2PasswordRequestForm = Depends()):
 async def refresh_token(refresh_token: str):
     try:
         payload = verify_access_token(refresh_token)
-        
+
         user_email = payload.get("user")
 
         if user_email is None:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
             )
 
         access_token = create_access_token(user_email)
@@ -103,56 +84,58 @@ async def refresh_token(refresh_token: str):
             content={
                 "access_token": access_token,
                 "refresh_token": refresh_token,
-                "token_type": "Bearer"
+                "token_type": "Bearer",
             },
-            status_code=status.HTTP_200_OK
+            status_code=status.HTTP_200_OK,
         )
     except Exception as e:
         print(str(e))
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid Token Provided"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Token Provided"
         )
+
 
 # Signup View
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED, response_description="Create A New User")
+@router.post(
+    "/signup",
+    status_code=status.HTTP_201_CREATED,
+    response_description="Create A New User",
+)
 async def create_user_view(
-        first_name: Annotated[str, Form()],
-        last_name: Annotated[str, Form()],
-        username: Annotated[str, Form()],
-        email_address: Annotated[str, Form()],
-        password: Annotated[str, Form()],
-        role: Annotated[str, Form()],
-        active: Annotated[str, Form()],
-        location: Annotated[str, Form()],
-        profile_pic: UploadFile
-        ):
+    first_name: Annotated[str, Form()],
+    last_name: Annotated[str, Form()],
+    username: Annotated[str, Form()],
+    email_address: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+    role: Annotated[str, Form()],
+    active: Annotated[str, Form()],
+    location: Annotated[str, Form()],
+    profile_pic: UploadFile,
+):
     try:
         # Check if user email exists
         get_user = await get_user_by_email(email=email_address)
 
-        if get_user.get('message') == "Successful":
+        if get_user.get("message") == "Successful":
 
             response = {
                 "message": "User With Email Already Exists",
-                "status": status.HTTP_409_CONFLICT
+                "status": status.HTTP_409_CONFLICT,
             }
 
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content=response
-            )
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content=response)
 
         # Upload Image to Supabase Bucket
         upload_response = upload_to_supabase(
-            profile_pic.file, profile_pic.filename)  # type: ignore
+            profile_pic.file, profile_pic.filename  # type: ignore
+        )  # type: ignore
 
         url_response = json.loads(upload_response.body)
 
-        if url_response['status'] == 200:
-            public_url = url_response['public_url']
+        if url_response["status"] == 200:
+            public_url = url_response["public_url"]
 
         # Create User
         user_dict = {
@@ -166,17 +149,17 @@ async def create_user_view(
             "location": location,
             "profile_pic": public_url,
             "created_at": datetime.now(),
-            "updated_at": datetime.now()
+            "updated_at": datetime.now(),
         }
 
         user_data = await create_user(user_details=user_dict)
 
-        if user_data.get('message') == "Successful":
+        if user_data.get("message") == "Successful":
 
             response = {
                 "message": "User Created Successfully",
                 "status": status.HTTP_200_OK,
-                "data": jsonable_encoder(user_data.get("data"))
+                "data": jsonable_encoder(user_data.get("data")),
             }
 
         return JSONResponse(content=response, status_code=status.HTTP_201_CREATED)
@@ -186,15 +169,19 @@ async def create_user_view(
         response = {
             "message": "Error Creating User",
             "status": status.HTTP_400_BAD_REQUEST,
-            "error": f"{str(e)}"
+            "error": f"{str(e)}",
         }
 
         return JSONResponse(content=response, status_code=status.HTTP_400_BAD_REQUEST)
 
 
 # User Update
-@router.put("/update/{id}", status_code=status.HTTP_200_OK, response_description="Update User")
-async def update_user_view(id: str, user_data: UserUpdateSchema = Body(...), user: str = Depends(authenticate)):
+@router.put(
+    "/update/{id}", status_code=status.HTTP_200_OK, response_description="Update User"
+)
+async def update_user_view(
+    id: str, user_data: UserUpdateSchema = Body(...), user: str = Depends(authenticate)
+):
     try:
         pass
     except Exception as e:
@@ -202,7 +189,7 @@ async def update_user_view(id: str, user_data: UserUpdateSchema = Body(...), use
         response = {
             "message": "Error Updating User",
             "status": status.HTTP_400_BAD_REQUEST,
-            "error": f"{str(e)}"
+            "error": f"{str(e)}",
         }
 
         return JSONResponse(content=response, status_code=status.HTTP_400_BAD_REQUEST)
