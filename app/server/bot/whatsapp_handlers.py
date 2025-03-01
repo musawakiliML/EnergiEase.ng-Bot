@@ -1,39 +1,50 @@
 import logging
-from uuid6 import uuid7
 from datetime import datetime
 
-from app.server.utils.whatsapp import send_whatsapp_message_normal, send_whatsapp_message_opening_buttons, send_disco_list_message, send_meter_type_buttons
-from app.server.bot.whatsapp_messages import options_menu, order_confirmation, order_failed_whatsapp,order_payment, order_successful_whatsapp, order_summary, quit_chat, customer_support, meter_number_menu, bill_amount_menu
-
-# Get Account Creation Modules and Electricity bills
-from app.server.utils.virtual_account import *
-from app.server.utils.vtpass_utils import (
-    get_meter_details_vtpass
+from app.server.bot.whatsapp_messages import (
+    bill_amount_menu,
+    customer_support,
+    meter_number_menu,
+    order_failed_whatsapp,
+    order_payment_updated,
+    order_summary_updated,
+    quit_chat,
 )
-
-from app.server.utils.paystack_payment import create_transaction_url
 
 # Database Modules
 from app.server.database.crud import (
-    get_single_order,
     create_order,
-    get_user_profile,
     create_user_profile,
-    update_user_order,
     create_user_session,
-    get_single_session,
     delete_user_session,
-    update_user_session
+    get_single_session,
+    get_user_profile,
+    update_user_order,
+    update_user_session,
+)
+from app.server.utils.paystack_payment import create_transaction_url
+
+# Get Account Creation Modules and Electricity bills
+from app.server.utils.virtual_account import create_account
+from app.server.utils.vtpass_utils import get_meter_details_vtpass
+from app.server.utils.whatsapp import (
+    send_call_to_action_payment_whatsapp,
+    send_confirm_order_message,
+    send_disco_list_message,
+    send_meter_type_buttons,
+    send_whatsapp_message_normal,
+    send_whatsapp_message_opening_buttons,
 )
 
 logging.basicConfig(level=logging.INFO)
+
 
 async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
     try:
         # Check if session exists
         get_chat = await get_single_session(phoneid)
 
-        if get_chat['user_phone_number'] == phonenumber:
+        if get_chat["user_phone_number"] == phonenumber:
 
             chat = get_chat
 
@@ -55,7 +66,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                 "username": profilename,
                 "full_name": profilename.upper(),
                 "user_id": phoneid,
-                "created_at": created_at
+                "created_at": created_at,
             }
 
             user_profile = await create_user_profile(user_profile_data)
@@ -88,7 +99,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                 "transaction_id": None,
                 "order_status": None,
                 "transaction_reference": None,
-                "created_at": created_at
+                "created_at": created_at,
             }
 
             # Create the chat session
@@ -99,19 +110,18 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
             print(f"Exception in Creating User Session: {str(e)}")
 
         # Bot Coversations
-        opening = ['hi', 'Hi', 'Hello', 'Hello',
-                   'Hey', 'hey', 'start', 'Start']
+        opening = ["hi", "Hi", "Hello", "Hello", "Hey", "hey", "start", "Start"]
         # opening_msg = random.choice(opening).upper()
-        
+
         # Check user input and send opening message
         if text in opening:
-            
+
             send_whatsapp_message_opening_buttons(phonenumber, profilename)
         else:
             message = f"Hey {profilename}, I'm a Bot To help you buy electricity unit, Just type 'Hi, Hey, or Hello' to start."
             send_whatsapp_message_normal(phonenumber, message)
 
-    quit_inputs = ['q', 'Q', 'Quit', 'quit', 'QUIT']
+    quit_inputs = ["q", "Q", "Quit", "quit", "QUIT"]
 
     # Bot Conversational Logic
 
@@ -125,88 +135,117 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                         if chat["user_amount"]:  # type: ignore
                             if chat["user_confirm"]:  # type: ignore
                                 if text in quit_inputs:
-                                    
+
                                     message = quit_chat()
-                                    
+                                    send_whatsapp_message_normal(phonenumber, message)
+
                                     await delete_user_session(phoneid)
-                                    
+
                                     update_data = ["order_status", "FAILED"]
-                                    
+
                                     await update_user_order(update_data, phoneid)
-                                    await update_user_order(["unit_confirmation", "FAILED"], phoneid)
-                                    
-                                    send_whatsapp_message(phonenumber, message)
+                                    await update_user_order(
+                                        ["unit_confirmation", "FAILED"], phoneid
+                                    )
+
                                 else:
                                     message = "We are Already Processing Your Order!!!"
-                                    send_whatsapp_message(phonenumber, message)
+                                    send_whatsapp_message_normal(phonenumber, message)
                             else:
                                 try:
-                                    check_type = int(text.replace(' ', ''))
-                                    if check_type == 1:
+                                    if text == "Confirm":
                                         update_data = ["user_confirm", text]
-                                        data = await update_user_session(update_data, phoneid)
+                                        data = await update_user_session(
+                                            update_data, phoneid
+                                        )
 
                                         # Generate Payment Details
-                                        # type: ignore
-                                        amount = chat['user_amount'] # type: ignore
+                                        amount = chat["user_amount"]  # type: ignore
 
                                         generate_virtual_account = create_account(
-                                            name=profilename,
-                                            amount=amount
+                                            name=profilename, amount=amount
                                         )
-                                        if generate_virtual_account['status'] == "200":
-                                            account_number = generate_virtual_account['Account Number']
-                                            account_name = generate_virtual_account['Account Name']
-                                            bank_name = generate_virtual_account['Bank']
-                                            transaction_id = generate_virtual_account["ID"]
-                                            payment_status = generate_virtual_account["Payment Status"]
+                                        if generate_virtual_account["status"] == "200":
+                                            account_number = generate_virtual_account[
+                                                "Account Number"
+                                            ]
+                                            account_name = generate_virtual_account[
+                                                "Account Name"
+                                            ]
+                                            bank_name = generate_virtual_account["Bank"]
+                                            transaction_id = generate_virtual_account[
+                                                "ID"
+                                            ]
+                                            payment_status = generate_virtual_account[
+                                                "Payment Status"
+                                            ]
 
                                             # Create Transaction URL for Paystack Payment
-                                            transaction_url: dict = create_transaction_url(
-                                                amount=int(amount) * 100,
-                                                payment_reference=transaction_id
+                                            transaction_url: dict = (
+                                                create_transaction_url(
+                                                    amount=int(amount) * 100,
+                                                    payment_reference=transaction_id,
+                                                )
                                             )
-                                            status = transaction_url.get(
-                                                "status", None)
+                                            status = transaction_url.get("status", None)
 
                                             if status == "200":
                                                 # Get the transaction url
 
                                                 response_url = transaction_url.get(
-                                                    "transaction_url")
+                                                    "transaction_url"
+                                                )
 
-                                                account_details = order_payment(
-                                                    str(amount), account_number, account_name, bank_name, transaction_url=response_url)
+                                                account_details = order_payment_updated(
+                                                    str(amount),
+                                                    account_number,
+                                                    account_name,
+                                                    bank_name,
+                                                )
+
+                                                send_call_to_action_payment_whatsapp(
+                                                    phone_number=phonenumber,
+                                                    body_text=account_details,
+                                                    transaction_url=response_url,
+                                                )
 
                                             else:
-                                                account_details = order_payment(
-                                                    str(amount), account_number, account_name, bank_name, transaction_url="")
+                                                account_details = order_payment_updated(
+                                                    str(amount),
+                                                    account_number,
+                                                    account_name,
+                                                    bank_name,
+                                                )
 
-                                            message = account_details
+                                                send_call_to_action_payment_whatsapp(
+                                                    phone_number=phonenumber,
+                                                    body_text=account_details,
+                                                    transaction_url="https://www.energiease.ng",
+                                                )
 
-                                            send_whatsapp_message(
-                                                phonenumber, message)
-
-                                            await update_user_session(["transaction_id", transaction_id], phoneid)
-                                            await update_user_session(["payment_confirmation", payment_status], phoneid)
+                                            await update_user_session(
+                                                ["transaction_id", transaction_id],
+                                                phoneid,
+                                            )
+                                            await update_user_session(
+                                                [
+                                                    "payment_confirmation",
+                                                    payment_status,
+                                                ],
+                                                phoneid,
+                                            )
 
                                             # Create order
                                             order_data = {
-                                                "user_profile": chat['user_profile'],  # type: ignore
+                                                "user_profile": chat["user_profile"],  # type: ignore
                                                 "session_id": phoneid,  # type: ignore
-                                                "meter_distribution": chat['meter_distribution'], # type: ignore
-                                                
-                                                "user_meter_number": chat['user_meter_number'], # type: ignore
-                                                
-                                                "meter_owner": chat['meter_owner'], # type: ignore
-                                                
-                                                "meter_address": chat['meter_address'], # type: ignore
-                                                
-                                                "user_amount": chat['user_amount'], # type: ignore
-                                                
-                                                "meter_type": chat['meter_type'], # type: ignore
-                                                
-                                                "meter_code": chat['meter_code'], # type: ignore
+                                                "meter_distribution": chat["meter_distribution"],  # type: ignore
+                                                "user_meter_number": chat["user_meter_number"],  # type: ignore
+                                                "meter_owner": chat["meter_owner"],  # type: ignore
+                                                "meter_address": chat["meter_address"],  # type: ignore
+                                                "user_amount": chat["user_amount"],  # type: ignore
+                                                "meter_type": chat["meter_type"],  # type: ignore
+                                                "meter_code": chat["meter_code"],  # type: ignore
                                                 "token": None,
                                                 "units": None,
                                                 "payment_confirmation": payment_status,
@@ -214,38 +253,32 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                                 "transaction_id": transaction_id,
                                                 "order_status": "",
                                                 "transaction_reference": None,
-                                                "created_at": created_at
+                                                "created_at": created_at,
                                             }  # type: ignore
 
                                             await create_order(order_data)
 
                                             # await delete_user_session(phoneid)
 
-                                        elif generate_virtual_account['status'] == "400":
+                                        elif (
+                                            generate_virtual_account["status"] == "400"
+                                        ):
 
                                             reply_text = order_failed_whatsapp(
-                                                
-                                                order_id=chat["_id"] # type: ignore
+                                                order_id=chat["_id"]  # type: ignore
                                             )
 
                                             # Create order
                                             order_data = {
-                                                "user_profile": chat['user_profile'], # type: ignore
+                                                "user_profile": chat["user_profile"],  # type: ignore
                                                 "session_id": phoneid,
-                                                
-                                                "meter_distribution": chat['meter_distribution'], # type: ignore
-                                                
-                                                "user_meter_number": chat['user_meter_number'], # type: ignore
-                                                
-                                                "meter_owner": chat['meter_owner'], # type: ignore
-                                                
-                                                "meter_address": chat['meter_address'], # type: ignore
-                                                
-                                                "user_amount": chat['user_amount'], # type: ignore
-                                                
-                                                "meter_type": chat['meter_type'], # type: ignore
-                                                
-                                                "meter_code": chat['meter_code'], # type: ignore
+                                                "meter_distribution": chat["meter_distribution"],  # type: ignore
+                                                "user_meter_number": chat["user_meter_number"],  # type: ignore
+                                                "meter_owner": chat["meter_owner"],  # type: ignore
+                                                "meter_address": chat["meter_address"],  # type: ignore
+                                                "user_amount": chat["user_amount"],  # type: ignore
+                                                "meter_type": chat["meter_type"],  # type: ignore
+                                                "meter_code": chat["meter_code"],  # type: ignore
                                                 "token": None,
                                                 "units": None,
                                                 "payment_confirmation": "NO_PAYMENT",
@@ -253,34 +286,30 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                                 "transaction_id": None,
                                                 "order_status": "FAILED",
                                                 "transaction_reference": None,
-                                                "created_at": created_at
+                                                "created_at": created_at,
                                             }  # type: ignore
 
+                                            send_whatsapp_message_normal(
+                                                phonenumber, reply_text
+                                            )
+
                                             await create_order(order_data)
-                                            send_whatsapp_message(
-                                                phonenumber, reply_text)
+
                                             await delete_user_session(phoneid)
 
-                                    elif check_type == 2:
+                                    elif text == "Cancel":
                                         # Create a Failed Order and Delete Session
 
                                         order_data = {
-                                            "user_profile": chat["user_profile"], # type: ignore
-                                            "session_id": phoneid, # type: ignore
-                                            
-                                            "meter_distribution": chat['meter_distribution'], # type: ignore
-                                            
-                                            "user_meter_number": chat['user_meter_number'], # type: ignore
-                                            
-                                            "meter_owner": chat['meter_owner'], # type: ignore
-                                            
-                                            "meter_address": chat['meter_address'], # type: ignore
-                                            
-                                            "user_amount": chat['user_amount'], # type: ignore
-                                            
-                                            "meter_type": chat['meter_type'], # type: ignore
-                                            
-                                            "meter_code": chat['meter_code'], # type: ignore
+                                            "user_profile": chat["user_profile"],  # type: ignore
+                                            "session_id": phoneid,  # type: ignore
+                                            "meter_distribution": chat["meter_distribution"],  # type: ignore
+                                            "user_meter_number": chat["user_meter_number"],  # type: ignore
+                                            "meter_owner": chat["meter_owner"],  # type: ignore
+                                            "meter_address": chat["meter_address"],  # type: ignore
+                                            "user_amount": chat["user_amount"],  # type: ignore
+                                            "meter_type": chat["meter_type"],  # type: ignore
+                                            "meter_code": chat["meter_code"],  # type: ignore
                                             "token": None,
                                             "units": None,
                                             "payment_confirmation": "NO_PAYMENT",
@@ -288,92 +317,97 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                             "transaction_id": None,
                                             "order_status": "FAILED",
                                             "transaction_reference": None,
-                                            "created_at": created_at
+                                            "created_at": created_at,
                                         }  # type: ignore
 
                                         await create_order(order_data)
 
                                         message = order_failed_whatsapp(
-                                            chat['_id'])  # type: ignore
-                                        send_whatsapp_message(
-                                            phonenumber, message)
+                                            chat["_id"]
+                                        )  # type: ignore
+                                        send_whatsapp_message_normal(
+                                            phonenumber, message
+                                        )
 
                                         message = quit_chat()
-                                        send_whatsapp_message(
-                                            phonenumber, message)
+                                        send_whatsapp_message_normal(
+                                            phonenumber, message
+                                        )
 
                                         await delete_user_session(phoneid)
                                     else:
                                         message = "Oops 😓 Please Enter a Valid Input:"
-                                        send_whatsapp_message(
-                                            phonenumber, message)
-                                except Exception as e:
+                                        send_whatsapp_message_normal(
+                                            phonenumber, message
+                                        )
+
+                                except Exception:
                                     if text in quit_inputs:
                                         message = quit_chat()
-                                        send_whatsapp_message(
-                                            phonenumber, message)
+                                        send_whatsapp_message_normal(
+                                            phonenumber, message
+                                        )
                                         await delete_user_session(phoneid)
                                     else:
-                                        message = f"Oops 😓 Please Enter a Valid Amount{str(e)}:"
-                                        send_whatsapp_message(
-                                            phonenumber, message)
+                                        message = "Oops 😓 Please Enter a Valid Input:"
+                                        send_whatsapp_message_normal(
+                                            phonenumber, message
+                                        )
                         else:
                             try:
-                                check_type = int(text.replace(' ', ''))
+                                check_type = int(text.replace(" ", ""))
                                 if check_type >= 1000:
                                     update_data = ["user_amount", text]
-                                    data = await update_user_session(update_data, phoneid)
+                                    data = await update_user_session(
+                                        update_data, phoneid
+                                    )
 
                                     # Get Meter Details
                                     user_meter_details = get_meter_details_vtpass(
                                         # type: ignore
-                                        meter_number=data["user_meter_number"], # type: ignore
-                                        
-                                        meter_type=data["meter_type"], # type: ignore
-                                        
-                                        disco=data['meter_code'] # type: ignore
+                                        meter_number=data["user_meter_number"],  # type: ignore
+                                        meter_type=data["meter_type"],  # type: ignore
+                                        disco=data["meter_code"],  # type: ignore
                                     )
-                                    
+
                                     if user_meter_details["status"] == "200":
                                         # get from api call
                                         meter_owner = user_meter_details["meter_name"]
                                         # get from api call
-                                        meter_address = user_meter_details["meter_address"]
-                                        
-                                        # Update user Session
-                                        await update_user_session(["meter_owner", meter_owner], phoneid)
-                                        await update_user_session(["meter_address", meter_address], phoneid)
-                                        
-                                        message = order_summary(
-                                        meter_owner,
-                                        data["user_amount"],  # type: ignore
-                                        
-                                        data["user_meter_number"], # type: ignore
-                                        data["meter_type"],  # type: ignore
-                                        meter_address
-                                    )
+                                        meter_address = user_meter_details[
+                                            "meter_address"
+                                        ]
 
-                                        send_whatsapp_message_normal(phonenumber, message)
+                                        # Update user Session
+                                        await update_user_session(
+                                            ["meter_owner", meter_owner], phoneid
+                                        )
+                                        await update_user_session(
+                                            ["meter_address", meter_address], phoneid
+                                        )
+
+                                        message = order_summary_updated(
+                                            meter_owner,
+                                            data["user_amount"],  # type: ignore
+                                            data["user_meter_number"],  # type: ignore
+                                            data["meter_type"],  # type: ignore
+                                            meter_address,
+                                        )
+
+                                        send_confirm_order_message(phonenumber, message)
                                     else:
                                         # Create a Failed Order and Delete Session
 
                                         order_data = {
-                                            "user_profile": chat["user_profile"], # type: ignore
+                                            "user_profile": chat["user_profile"],  # type: ignore
                                             "session_id": phoneid,
-                                            
-                                            "meter_distribution": chat['meter_distribution'], # type: ignore
-                                            
-                                            "user_meter_number": chat['user_meter_number'], # type: ignore
-                                            
-                                            "meter_owner": chat['meter_owner'], # type: ignore
-                                            
-                                            "meter_address": chat['meter_address'], # type: ignore
-                                            
-                                            "user_amount": chat['user_amount'], # type: ignore
-                                            
-                                            "meter_type": chat['meter_type'], # type: ignore
-                                            
-                                            "meter_code": chat['meter_code'], # type: ignore
+                                            "meter_distribution": chat["meter_distribution"],  # type: ignore
+                                            "user_meter_number": chat["user_meter_number"],  # type: ignore
+                                            "meter_owner": chat["meter_owner"],  # type: ignore
+                                            "meter_address": chat["meter_address"],  # type: ignore
+                                            "user_amount": chat["user_amount"],  # type: ignore
+                                            "meter_type": chat["meter_type"],  # type: ignore
+                                            "meter_code": chat["meter_code"],  # type: ignore
                                             "token": None,
                                             "units": None,
                                             "payment_confirmation": "NO_PAYMENT",
@@ -381,14 +415,16 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                             "transaction_id": None,
                                             "order_status": "FAILED",
                                             "transaction_reference": None,
-                                            "created_at": created_at
-                                        }  
+                                            "created_at": created_at,
+                                        }
 
                                         await create_order(order_data)
                                         message = order_failed_whatsapp(
-                                            chat['_id'])  # type: ignore
+                                            chat["_id"]
+                                        )  # type: ignore
                                         send_whatsapp_message_normal(
-                                            phonenumber, message)
+                                            phonenumber, message
+                                        )
                                         await delete_user_session(phoneid)
                                 else:
 
@@ -405,8 +441,10 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                     else:
                         try:
                             if text == "Prepaid":
-                                
-                                data = await update_user_session(["meter_type", "prepaid"], phoneid)
+
+                                data = await update_user_session(
+                                    ["meter_type", "prepaid"], phoneid
+                                )
                                 message = bill_amount_menu()
                                 send_whatsapp_message_normal(phonenumber, message)
 
@@ -436,11 +474,15 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                     billers_id = "yola-electric"
 
                                 # Update Database
-                                await update_user_session(["meter_code", billers_id], phoneid)
-                                
+                                await update_user_session(
+                                    ["meter_code", billers_id], phoneid
+                                )
+
                             elif text == "Postpaid":
-                                
-                                data = await update_user_session(["meter_type", "postpaid"], phoneid)
+
+                                data = await update_user_session(
+                                    ["meter_type", "postpaid"], phoneid
+                                )
                                 message = bill_amount_menu()
                                 send_whatsapp_message_normal(phonenumber, message)
 
@@ -470,8 +512,10 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                     billers_id = "yola-electric"
 
                                 # Update Database
-                                await update_user_session(["meter_code", billers_id], phoneid)
-                                
+                                await update_user_session(
+                                    ["meter_code", billers_id], phoneid
+                                )
+
                             else:
                                 message = "Oops 😓 Please Enter a Valid Amount:"
                                 send_whatsapp_message_normal(phonenumber, message)
@@ -490,9 +534,9 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                             send_whatsapp_message_normal(phonenumber, message)
 
                         else:
-                            
+
                             send_meter_type_buttons(phonenumber)
-                            
+
                             update_data = ["user_meter_number", text]
                             await update_user_session(update_data, phoneid)
 
@@ -506,24 +550,35 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                             send_whatsapp_message_normal(phonenumber, message)
             else:
                 try:
-                    
-                    if text in ["AEDC","EEDC", "EKEDC", "IBEDCO", "IKEDC","JED", "KAEDCO", "KEDCO", "PHED", "BEDC"]:
-                        
+
+                    if text in [
+                        "AEDC",
+                        "EEDC",
+                        "EKEDC",
+                        "IBEDCO",
+                        "IKEDC",
+                        "JED",
+                        "KAEDCO",
+                        "KEDCO",
+                        "PHED",
+                        "BEDC",
+                    ]:
+
                         message = meter_number_menu()
                         send_whatsapp_message_normal(phonenumber, message)
-                        
+
                         update_data = ["user_input_2", text]
                         await update_user_session(update_data, phoneid)
-                        
+
                         await update_user_session(["meter_distribution", text], phoneid)
                     else:
                         message = "Oops 😓 Please Enter a valid input:"
                         send_whatsapp_message_normal(phonenumber, message)
 
                 except Exception:
-                    
+
                     if text in quit_inputs:
-                        
+
                         message = quit_chat()
                         send_whatsapp_message_normal(phonenumber, message)
                         await delete_user_session(phoneid)
@@ -534,32 +589,32 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
         else:
             try:
                 if text == "Buy Electricity":
-                    
+
                     send_disco_list_message(phonenumber)
-                    
+
                     update_data = ["user_input_1", text]
                     await update_user_session(update_data, phoneid)
-                    
+
                 elif text == "Customer Support":
-                    
+
                     message = customer_support()
                     send_whatsapp_message_normal(phonenumber, message)
-                    
+
                     update_data = ["user_input_1", text]
                     await update_user_session(update_data, phoneid)
-                    
+
                 elif text == "Meter KTC":
-                    
+
                     message = customer_support()
                     send_whatsapp_message_normal(phonenumber, message)
-                    
+
                     update_data = ["user_input_1", text]
                     await update_user_session(update_data, phoneid)
-                    
+
                 else:
                     message = "Oops 😓 Please Enter a Number:"
                     send_whatsapp_message_normal(phonenumber, message)
-                    
+
             except Exception:
                 if text in quit_inputs:
                     message = quit_chat()

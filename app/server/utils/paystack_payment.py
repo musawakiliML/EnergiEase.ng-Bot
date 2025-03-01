@@ -1,5 +1,4 @@
 import os
-import uuid6
 from app.server.utils import paystack_config
 from dotenv import load_dotenv
 
@@ -26,7 +25,7 @@ def create_transaction_url(amount,
                                                 payment_reference=payment_reference
                                                 )
       status = response.get("status", False)
-      if status == True:
+      if status:
          data = {
             "status":"200",
             "transaction_url": response['data']['authorization_url']
@@ -37,7 +36,7 @@ def create_transaction_url(amount,
                 "status": 400,
                 "message": "Error has occured!!"
             }
-   except Exception as e:
+   except Exception:
       return {
                 "status": 400,
                 "message": "Error has occured!!"

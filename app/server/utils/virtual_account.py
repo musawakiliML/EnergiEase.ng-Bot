@@ -22,7 +22,7 @@ from app.server.database.crud import (
 )
 from app.server.utils.api_config import FintavaCredentials, FintavaOperations
 from app.server.utils.vtpass_utils import buy_meter_unit_vtpass
-from app.server.utils.whatsapp import send_whatsapp_message
+from app.server.utils.whatsapp import send_whatsapp_message_normal
 
 fintava_credentials = FintavaCredentials(api_key=True, is_live=True)
 
@@ -107,7 +107,7 @@ async def verify_payment_buy_unit(
                 )
                 message = order_confirmation(order_id=order_id)
 
-                send_whatsapp_message(user_phone_number["user_phone_number"], message)
+                send_whatsapp_message_normal(user_phone_number["user_phone_number"], message)
             else:
                 # Send Order Confirmation Message telegram
                 user_id = get_order_details["user_profile"]["user_id"]  # type: ignore
@@ -164,7 +164,7 @@ async def verify_payment_buy_unit(
                         meter_token=meter_token,
                     )
 
-                    send_whatsapp_message(
+                    send_whatsapp_message_normal(
                         user_phone_number["user_phone_number"], message
                     )
                 else:
@@ -204,7 +204,7 @@ async def verify_payment_buy_unit(
                         get_order_details["session_id"]
                     )
                     message = order_failed_whatsapp(order_id=order_id)
-                    send_whatsapp_message(
+                    send_whatsapp_message_normal(
                         user_phone_number["user_phone_number"], message
                     )
 
@@ -242,7 +242,7 @@ async def verify_payment_buy_unit(
                     get_order_details["session_id"]
                 )
                 message = order_failed_whatsapp(order_id=order_id)
-                send_whatsapp_message(user_phone_number["user_phone_number"], message)
+                send_whatsapp_message_normal(user_phone_number["user_phone_number"], message)
             else:
 
                 # Send Order Failed Message on Telegram
