@@ -2,9 +2,8 @@ import random
 import logging
 from uuid6 import uuid7
 from datetime import datetime
-from bson.objectid import ObjectId
 
-from app.server.utils.whatsapp import send_whatsapp_message
+from app.server.utils.whatsapp import send_whatsapp_message, send_whatsapp_message_normal, send_whatsapp_message_opening_buttons
 from app.server.bot.whatsapp_messages import *
 
 # Get Account Creation Modules and Electricity bills
@@ -17,7 +16,6 @@ from app.server.utils.paystack_payment import create_transaction_url
 
 # Database Modules
 from app.server.database.crud import (
-    delete_user_session,
     get_single_order,
     create_order,
     get_user_profile,
@@ -29,6 +27,7 @@ from app.server.database.crud import (
     update_user_session
 )
 
+logging.basicConfig(level=logging.INFO)
 
 async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
     try:
@@ -39,7 +38,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
 
             chat = get_chat
 
-    except:
+    except Exception:
         created_at = datetime.now()
 
         # Check if User profile Exists
@@ -103,11 +102,12 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
         # Bot Coversations
         opening = ['hi', 'Hi', 'Hello', 'Hello',
                    'Hey', 'hey', 'start', 'Start']
-        opening_msg = random.choice(opening).upper()
-
-        if text in opening or text:
-            message = welcome_menu(opening_msg, profilename)
-            send_whatsapp_message(phonenumber, message)
+        # opening_msg = random.choice(opening).upper()
+        
+        # Check user input and send opening message
+        if text in opening:
+            
+            send_whatsapp_message_opening_buttons(phonenumber, profilename)
 
     quit_inputs = ['q', 'Q', 'Quit', 'quit', 'QUIT']
 
@@ -589,25 +589,35 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                         send_whatsapp_message(phonenumber, message)
         else:
             try:
-                check_type = int(text.replace(' ', ''))
-                if check_type == 1:
-
-                    update_data = ["user_input_1", text]
-                    await update_user_session(update_data, phoneid)
+                if text == "Buy Electricity":
+                    
                     message = options_menu()
                     send_whatsapp_message(phonenumber, message)
-
-                elif check_type == 2:
-
+                    
                     update_data = ["user_input_1", text]
                     await update_user_session(update_data, phoneid)
+                    
+                elif text == "Customer Support":
+                    
                     message = customer_support()
                     send_whatsapp_message(phonenumber, message)
-
+                    
+                    update_data = ["user_input_1", text]
+                    await update_user_session(update_data, phoneid)
+                    
+                elif text == "Meter KTC":
+                    
+                    message = customer_support()
+                    send_whatsapp_message(phonenumber, message)
+                    
+                    update_data = ["user_input_1", text]
+                    await update_user_session(update_data, phoneid)
+                    
                 else:
                     message = "Oops 😓 Please Enter a Number:"
                     send_whatsapp_message(phonenumber, message)
-            except:
+                    
+            except Exception:
                 if text in quit_inputs:
                     message = quit_chat()
                     send_whatsapp_message(phonenumber, message)
@@ -616,5 +626,5 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                     message = "Oops 😓 Please Enter a Number:"
                     send_whatsapp_message(phonenumber, message)
     else:
-        update_data = ["entry_message", opening_msg]
+        update_data = ["entry_message", text]
         await update_user_session(update_data, phoneid)
