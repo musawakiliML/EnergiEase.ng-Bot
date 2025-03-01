@@ -195,3 +195,42 @@ def send_meter_type_buttons(phone_number):
     response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
+
+
+# Send Confirm Message
+def send_confirm_order_message(phone_number: str, body_text: str) -> dict:
+
+    headers = {
+        "Authorization": os.environ["WHATSAPP_TOKEN"],
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": phone_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "header": {"type": "text", "text": "Hurray! Here is your order summary:"},
+            "body": {"text": f"{body_text}"},
+            "footer": {"text": "Powered By Mind Colony™"},
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {"id": "confirm-button", "title": "Confirm"},
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {"id": "cancel-button", "title": "Cancel"},
+                    },
+                ]
+            },
+        },
+    }
+
+    response = requests.post(
+        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response_json = response.json()
+    return response_json

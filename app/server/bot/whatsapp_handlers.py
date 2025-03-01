@@ -2,8 +2,8 @@ import logging
 from uuid6 import uuid7
 from datetime import datetime
 
-from app.server.utils.whatsapp import send_whatsapp_message_normal, send_whatsapp_message_opening_buttons, send_disco_list_message, send_meter_type_buttons
-from app.server.bot.whatsapp_messages import options_menu, order_confirmation, order_failed_whatsapp,order_payment, order_successful_whatsapp, order_summary, quit_chat, customer_support, meter_number_menu, bill_amount_menu
+from app.server.utils.whatsapp import send_whatsapp_message_normal, send_whatsapp_message_opening_buttons, send_disco_list_message, send_meter_type_buttons, send_confirm_order_message
+from app.server.bot.whatsapp_messages import  order_confirmation, order_failed_whatsapp, order_payment, order_successful_whatsapp, order_summary, quit_chat, customer_support, meter_number_menu, bill_amount_menu, order_summary_updated
 
 # Get Account Creation Modules and Electricity bills
 from app.server.utils.virtual_account import *
@@ -127,6 +127,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                 if text in quit_inputs:
                                     
                                     message = quit_chat()
+                                    send_whatsapp_message_normal(phonenumber, message)
                                     
                                     await delete_user_session(phoneid)
                                     
@@ -135,10 +136,10 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                     await update_user_order(update_data, phoneid)
                                     await update_user_order(["unit_confirmation", "FAILED"], phoneid)
                                     
-                                    send_whatsapp_message(phonenumber, message)
+                                    
                                 else:
                                     message = "We are Already Processing Your Order!!!"
-                                    send_whatsapp_message(phonenumber, message)
+                                    send_whatsapp_message_normal(phonenumber, message)
                             else:
                                 try:
                                     check_type = int(text.replace(' ', ''))
@@ -344,7 +345,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         await update_user_session(["meter_owner", meter_owner], phoneid)
                                         await update_user_session(["meter_address", meter_address], phoneid)
                                         
-                                        message = order_summary(
+                                        message = order_summary_updated(
                                         meter_owner,
                                         data["user_amount"],  # type: ignore
                                         
@@ -353,7 +354,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         meter_address
                                     )
 
-                                        send_whatsapp_message_normal(phonenumber, message)
+                                        send_confirm_order_message(phonenumber, message)
                                     else:
                                         # Create a Failed Order and Delete Session
 
