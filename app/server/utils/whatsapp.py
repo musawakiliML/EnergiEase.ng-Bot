@@ -6,6 +6,7 @@ from twilio.rest import Client
 
 load_dotenv()
 
+# Twilio Message Handler
 
 def send_whatsapp_message(recipient_number: str, body: str):
 
@@ -78,5 +79,82 @@ def send_whatsapp_message_opening_buttons(phone_number, name):
     }
     response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
-    print(response_json)
+    return response_json
+
+
+# Send Disco List Plans
+
+def send_disco_list_message(phone_number: str) -> dict:
+
+    headers = {
+        "Authorization": os.environ["WHATSAPP_TOKEN"],
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": phone_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "header": {"type": "text", "text": "Discos List"},
+            "body": {"text": "That's perfect!! 👍 Choose from the Distribution Companies available below:"},
+            "footer": {"text": "Powered By Mind Colony™"},
+            "action": {
+                "button": "Select Disco",
+                "sections": [
+                    {
+                        "title": "Discos",
+                        "rows": [
+                            {
+                                "id": "aedc",
+                                "title": "AEDC",
+                            },
+                            {
+                                "id": "eedc",
+                                "title": "EEDC",
+                            },
+                            {
+                               "id": "ekedc",
+                                "title": "EKEDC",
+                            },
+                            {
+                                "id": "ibedco",
+                                "title": "IBEDCO",
+                            },
+                            {
+                                "id": "ikedc",
+                                "title": "IKEDC",
+                            },
+                            {
+                                "id": "jed",
+                                "title": "JED",
+                            },
+                            {
+                                "id": "kaedco",
+                                "title": "KAEDCO",
+                            },
+                            {
+                                "id": "kedco",
+                                "title": "KEDCO",
+                            },
+                            {
+                                "id": "phed",
+                                "title": "PHED",
+                            },
+                            {
+                                "id": "bedc",
+                                "title": "BEDC",
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+    }
+
+    response = requests.post(
+        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response_json = response.json()
     return response_json
