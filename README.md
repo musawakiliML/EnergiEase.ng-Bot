@@ -1,2 +1,3 @@
-# EnergiEase.ng Telegram Chatbot
-Buy Electricity Units In Nigeria using our Telegram Chatbot.
+# EnergiEase.ng Telegram and WhatsApp Chatbot
+
+Buy Electricity Units In Nigeria using our Telegram or WhatsApp Chatbot.

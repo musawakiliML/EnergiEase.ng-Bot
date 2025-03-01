@@ -35,7 +35,7 @@ from app.server.api.dashboard import router as Dashboard_router
 from app.server.api.user import router as User_router
 from app.server.api.paystack import router as Paystack_router
 from app.server.api.whatsapp import router as Whatsapp_router
-from app.server.api.whatsappflows import router as Whatsapp_flow_router
+# from app.server.api.whatsappflows import router as Whatsapp_flow_router
 
 # Enable Bot Token
 load_dotenv()
@@ -157,7 +157,7 @@ app.add_middleware(
 
 # Declare all routes
 app.include_router(Whatsapp_router, tags=["WhatsApp Webhook"], prefix='/whatsapphook')
-app.include_router(Whatsapp_flow_router, tags=['WhatsApp Flow Webhooks'], prefix='/whatsappflow')
+# app.include_router(Whatsapp_flow_router, tags=['WhatsApp Flow Webhooks'], prefix='/whatsappflow')
 app.include_router(Fintava_router, tags=["Fintava Webhook"], prefix='/fintavawebhook')
 app.include_router(Paystack_router, tags=["Paystack Webhook"], prefix='/paystackwebhook')
 app.include_router(Dashboard_router, tags=["Dashboard Views"], prefix='/dashboard')
