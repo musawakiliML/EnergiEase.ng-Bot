@@ -1,10 +1,9 @@
-import random
 import logging
 from uuid6 import uuid7
 from datetime import datetime
 
-from app.server.utils.whatsapp import send_whatsapp_message, send_whatsapp_message_normal, send_whatsapp_message_opening_buttons, send_disco_list_message
-from app.server.bot.whatsapp_messages import options_menu, order_confirmation, order_failed_whatsapp,order_payment, order_successful_whatsapp, order_summary, quit_chat, customer_support, meter_number_menu
+from app.server.utils.whatsapp import send_whatsapp_message_normal, send_whatsapp_message_opening_buttons, send_disco_list_message, send_meter_type_buttons
+from app.server.bot.whatsapp_messages import options_menu, order_confirmation, order_failed_whatsapp,order_payment, order_successful_whatsapp, order_summary, quit_chat, customer_support, meter_number_menu, bill_amount_menu
 
 # Get Account Creation Modules and Electricity bills
 from app.server.utils.virtual_account import *
@@ -108,6 +107,9 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
         if text in opening:
             
             send_whatsapp_message_opening_buttons(phonenumber, profilename)
+        else:
+            message = f"Hey {profilename}, I'm a Bot To help you buy electricity unit, Just type 'Hi, Hey, or Hello' to start."
+            send_whatsapp_message_normal(phonenumber, message)
 
     quit_inputs = ['q', 'Q', 'Quit', 'quit', 'QUIT']
 
@@ -332,7 +334,6 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         disco=data['meter_code'] # type: ignore
                                     )
                                     
-
                                     if user_meter_details["status"] == "200":
                                         # get from api call
                                         meter_owner = user_meter_details["meter_name"]
@@ -352,7 +353,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         meter_address
                                     )
 
-                                        send_whatsapp_message(phonenumber, message)
+                                        send_whatsapp_message_normal(phonenumber, message)
                                     else:
                                         # Create a Failed Order and Delete Session
 
@@ -386,28 +387,28 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                                         await create_order(order_data)
                                         message = order_failed_whatsapp(
                                             chat['_id'])  # type: ignore
-                                        send_whatsapp_message(
+                                        send_whatsapp_message_normal(
                                             phonenumber, message)
                                         await delete_user_session(phoneid)
                                 else:
 
                                     message = "Oops 😓 ❗Please enter an amount not below 1000:"
-                                    send_whatsapp_message(phonenumber, message)
-                            except:
+                                    send_whatsapp_message_normal(phonenumber, message)
+                            except Exception:
                                 if text in quit_inputs:
                                     message = quit_chat()
-                                    send_whatsapp_message(phonenumber, message)
+                                    send_whatsapp_message_normal(phonenumber, message)
                                     await delete_user_session(phoneid)
                                 else:
                                     message = "Oops 😓 ❗Please enter an amount not below 1000:"
-                                    send_whatsapp_message(phonenumber, message)
+                                    send_whatsapp_message_normal(phonenumber, message)
                     else:
                         try:
-                            check_type = int(text.replace(' ', ''))
-                            if check_type == 1:
+                            if text == "Prepaid":
+                                
                                 data = await update_user_session(["meter_type", "prepaid"], phoneid)
                                 message = bill_amount_menu()
-                                send_whatsapp_message(phonenumber, message)
+                                send_whatsapp_message_normal(phonenumber, message)
 
                                 if data["meter_distribution"] == "IKEDC":  # type: ignore
                                     billers_id = "ikeja-electric"
@@ -436,10 +437,12 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
 
                                 # Update Database
                                 await update_user_session(["meter_code", billers_id], phoneid)
-                            elif check_type == 2:
+                                
+                            elif text == "Postpaid":
+                                
                                 data = await update_user_session(["meter_type", "postpaid"], phoneid)
                                 message = bill_amount_menu()
-                                send_whatsapp_message(phonenumber, message)
+                                send_whatsapp_message_normal(phonenumber, message)
 
                                 if data["meter_distribution"] == "IKEDC":  # type: ignore
                                     billers_id = "ikeja-electric"
@@ -468,37 +471,39 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
 
                                 # Update Database
                                 await update_user_session(["meter_code", billers_id], phoneid)
+                                
                             else:
                                 message = "Oops 😓 Please Enter a Valid Amount:"
-                                send_whatsapp_message(phonenumber, message)
-                        except:
+                                send_whatsapp_message_normal(phonenumber, message)
+                        except Exception:
                             if text in quit_inputs:
                                 message = quit_chat()
-                                send_whatsapp_message(phonenumber, message)
+                                send_whatsapp_message_normal(phonenumber, message)
                                 await delete_user_session(phoneid)
                             else:
                                 message = "Oops 😓 Please Enter a Valid Input"
-                                send_whatsapp_message(phonenumber, message)
+                                send_whatsapp_message_normal(phonenumber, message)
                 else:
                     try:
                         if len(text) != 11 and len(text) != 13:
                             message = f"Oops 😓 Please Enter a Valid Meter Number (11 or 13 Digits){len(text)}:"
-                            send_whatsapp_message(phonenumber, message)
+                            send_whatsapp_message_normal(phonenumber, message)
 
                         else:
+                            
+                            send_meter_type_buttons(phonenumber)
+                            
                             update_data = ["user_meter_number", text]
                             await update_user_session(update_data, phoneid)
-                            message = meter_type_menu()
-                            send_whatsapp_message(phonenumber, message)
 
-                    except Exception as e:
+                    except Exception:
                         if text in quit_inputs:
                             message = quit_chat()
-                            send_whatsapp_message(phonenumber, message)
+                            send_whatsapp_message_normal(phonenumber, message)
                             await delete_user_session(phoneid)
                         else:
-                            message = f"Oops 😓 Please Enter a Valid Meter Number (11 or 13 Digits){str(e)}:"
-                            send_whatsapp_message(phonenumber, message)
+                            message = "Oops 😓 Please Enter a Valid Meter Number (11 or 13 Digits):"
+                            send_whatsapp_message_normal(phonenumber, message)
             else:
                 try:
                     
@@ -564,5 +569,6 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                     message = "Oops 😓 Please Enter a Number:"
                     send_whatsapp_message_normal(phonenumber, message)
     else:
-        update_data = ["entry_message", text]
-        await update_user_session(update_data, phoneid)
+        if text in opening:
+            update_data = ["entry_message", text]
+            await update_user_session(update_data, phoneid)

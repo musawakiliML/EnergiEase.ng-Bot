@@ -158,3 +158,40 @@ def send_disco_list_message(phone_number: str) -> dict:
         os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
+
+# Send meter type buttons
+
+def send_meter_type_buttons(phone_number):
+    headers = {"Authorization": os.environ["WHATSAPP_TOKEN"]}
+    payload = {
+        "messaging_product": "whatsapp",
+        "reciepient_type": "individual",
+        "to": phone_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "header": {"type": "text", "text": "Meter Type"},
+            "body": {
+                "text": "Please Select Your Meter Type:"
+            },
+            "footer": {"text": "Powered By Mind Colony™"},
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {"id": "prepaid", "title": "Prepaid"},
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "postpaid",
+                            "title": "Postpaid",
+                        },
+                    }
+                ]
+            },
+        },
+    }
+    response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response_json = response.json()
+    return response_json
