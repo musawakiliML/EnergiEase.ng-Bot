@@ -20,12 +20,12 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-api_key = os.environ['VTPASS_API_KEY']
-public_key = os.environ['VTPASS_PUBLIC_KEY']
-secret_key = os.environ['VTPASS_SECRET_KEY']
+api_key = os.environ['VTPASS_API_KEY_LIVE']
+public_key = os.environ['VTPASS_PUBLIC_KEY_LIVE']
+secret_key = os.environ['VTPASS_SECRET_KEY_LIVE']
 
 vtpass_credentials = VTPASSCredentials(
-    api_key, public_key, secret_key, is_live=False)
+    api_key, public_key, secret_key, is_live=True)
 
 credentials = vtpass_credentials.credentials()
 
@@ -33,18 +33,18 @@ vtpass = VTPASS()
 
 # Generate Reference ID for VTPASS
 
-
 def generated_request_id():
     lagos_timezone = pytz.timezone('Africa/Lagos')
     date_time_id = datetime.now(lagos_timezone).strftime('%Y%m%d%H%M')
     reference_id = str(uuid7()).split("-")[4]
     return date_time_id + reference_id
 
+# print(generated_request_id())
+
 # Extract Token From VTPASS Purchase
 
-
 def get_token_units(electricity_response, product):
-    """Get Electricity Token and Units from VTPASS Purchase
+    """ Get Electricity Token and Units from VTPASS Purchase
 
     Args:
         electricity_response (dict): VTPASS Response object
@@ -59,18 +59,28 @@ def get_token_units(electricity_response, product):
     try:
         tokens = str(
             electricity_response["purchased_code"].split(':')[1]).strip()
-        if product == "AEDC":
-            units = electricity_response['PurchasedUnits']
-        elif product == "IKEDC" or product == "EEDC" or product == "BEDC" or product == "PHED" or product == "KEDCO" or product == "KAEDCO":
-            units = electricity_response['units']
-        elif product == "EKEDC":
-            units = electricity_response['mainTokenUnits']
-        elif product == "IBEDCO" or product == "JED":
-            units = electricity_response['Units']
+        
+        unit_code = ['Units','PurchasedUnits','units','mainTokenUnits']
+        
+        for unit in unit_code:
+            units_value = electricity_response.get(unit, "None")
+            
+            if units_value != "None":
+                units = units_value
+                break
+        # if product == "AEDC":
+        #     units = electricity_response['PurchasedUnits']
+        # elif product == "IKEDC" or product == "EEDC" or product == "BEDC" or product == "PHED" or product == "KEDCO" or product == "KAEDCO":
+        #     units = electricity_response['units']
+        # elif product == "EKEDC":
+        #     units = electricity_response['mainTokenUnits']
+        # elif product == "IBEDCO" or product == "JED":
+        #     units = electricity_response['Units']
+        
+        # return units and tokens
         return {'tokens': tokens, 'units': units}
     except Exception as e:
         raise Exception({"message": str(e)})
-
 
 def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
     """Get Meter Details VTPASS
@@ -128,6 +138,9 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
             amount=amount,
             phone="08102778677"
         )
+        
+        logger.info(f"{user_meter_unit}")
+        
         response_status = user_meter_unit.get("code")
         if response_status == "000":
             if disco == "eko-electric":
@@ -150,6 +163,10 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
                 product = "EEDC"
             elif disco == "benin-electric":
                 product = "BEDC"
+            elif disco == "aba-electric":
+                product = "ABA"
+            elif disco == "yola-electric":
+                product = "YEDC"
             
             token_units = get_token_units(user_meter_unit, product)
             user_meter_unit_details = {
@@ -157,6 +174,7 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
                 "meter_units": token_units["units"],
                 "status": "200"
             }
+            logger.info(f"{user_meter_unit_details}")
 
             return user_meter_unit_details
         else:
@@ -176,8 +194,8 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
 
 # meter_details = vtpass.verify_meter(
 #             credentials=credentials,
-#             billers_code="1111111111111",
-#             service_id="jos-electric",
+#             billers_code="0219221239227",
+#             service_id="abuja-electric",
 #             meter_type="prepaid"
 #         )
 # print(meter_details)

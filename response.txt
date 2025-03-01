@@ -1,0 +1,58 @@
+# Dedicated Account Creation
+{'status': True, 'message': 'NUBAN successfully created', 'data': {'bank': {'name': 'Test Bank', 'id': 24, 'slug': 'test-bank'}, 'account_name': 'TEST-MANAGED-ACCOUNT', 'account_number': '1238182358', 'assigned': True, 'currency': 'NGN', 'metadata': None, 'active': True, 'id': 10280231, 'created_at': '2023-03-03T08:52:44.000Z', 'updated_at': '2024-07-05T23:13:20.000Z', 'assignment': {'integration': 1214911, 'assignee_id': 173770194, 'assignee_type': 'Customer', 'expired': False, 'account_type': 'PAY-WITH-TRANSFER-RECURRING', 'assigned_at': '2024-07-05T23:13:20.158Z', 'expired_at': None}, 'customer': {'id': 173770194, 'first_name': 'John', 'last_name': 'Doe', 'email': 'johndoe@example.com', 'customer_code': 'CUS_tz7f618xpo5ymai', 'phone': None, 'metadata': None, 'risk_action': 'default', 'international_format_phone': None}}}
+
+# Create Customer
+{'status': True, 'message': 'Customer created', 'data': {'transactions': [], 'subscriptions': [], 'authorizations': [], 'first_name': 'John', 'email': 'johndoe@example.com', 'last_name': 'Doe', 'integration': 1214911, 'domain': 'test', 'customer_code': 'CUS_tz7f618xpo5ymai', 'risk_action': 'default', 'id': 173770194, 'createdAt': '2024-07-05T23:08:09.512Z', 'updatedAt': '2024-07-05T23:08:09.512Z', 'identified': False, 'identifications': None}}
+
+08063459838
+
+# 'sk_test_e2004b6a166a3e3d94a05abcbbeb63cc044c93d6'
+
+ATAFOM
+# sk_test_b67447e5f558ce0f519b156aaf5836c3a6db57c7
+
+
+
+
+{'event': 'VIRTUAL_WALLET_PAYMENT', 'data': {'id': '7c19ce94-5418-4df5-abae-2c3392a21fbf', 'customerName': 'Musa Adamu Wakili', 'merchantReference': '4342eebe231f', 'reference': '090267240710203337043003333448', 'expireTimeInMin': 30, 'description': 'Electricity Purchase', 'metadata': None, 'amount': '100.00', 'phone': '+2348135810804', 'email': 'musaadamuw@gmail.com', 'bank': 'Loma Bank', 'virtualAcctName': 'Musa Wakili ML', 'virtualAcctNo': '0089646273', 'requestTime': '2024-07-10T19:29:39.373Z', 'status': 'PAID', 'paymentStatus': 'OVERPAID', 'sessionID': '090267240710203337043003333448', 'amountPaid': 1000, 'senderAccountName': 'MUSA WAKILI ADAMU', 'senderAccountNo': '2003333448', 'senderBankSortCode': '090267'}}
+
+
+{'code': '000', 'content': {'transactions': {'status': 'delivered', 'product_name': 'Abuja Electricity Distribution Company- AEDC', 'unique_element': '04180283956', 'unit_price': 4000, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': 48, 'total_amount': 3952, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 4000, 'platform': 'api', 'method': 'api', 'transactionId': '17222828533849598628526905'}}, 'response_description': 'TRANSACTION SUCCESSFUL', 'requestId': '202407292054f3758ef68da6', 'amount': '4000.00', 'transaction_date': {'date': '2024-07-29 19:54:13.000000', 'timezone_type': 2, 'timezone': 'Z'}, 'purchased_code': 'Token : 54943676017605028114', 'CustomerName': 'MRS AMAKA AMAKA  ', 'CustomerAddress': 'PLT 1107 MENDIANA CLSE OFF DARES-ESALEEM STR WUSE 2 ABUJA Und St. AP Service Centre', 'DebtTax': None, 'DebtAmount': None, 'DebtValue': None, 'DebtRem': None, 'FixedTax': None, 'FixedAmount': None, 'FixedValue': None, 'Amount': 4000, 'Tax': None, 'Units': 17.8, 'Token': '54943676017605028114', 'Tariff': None, 'Description': None, 'Receipt': '240729152533', 'KCT1': None, 'KCT2': None}
+
+
+{'event': 'charge.success', 'data': {'id': 4078613104, 'domain': 'test', 'status': 'success', 'reference': '01915641-36ac-72d7-be52-6460307210ea', 'amount': 10000, 'message': None, 'gateway_response': 'Successful', 'paid_at': '2024-08-15T13:38:20.000Z', 'created_at': '2024-08-15T13:36:41.000Z', 'channel': 'card', 'currency': 'NGN', 'ip_address': '197.210.53.137', 'metadata': '', 'fees_breakdown': None, 'log': None, 'fees': 150, 'fees_split': None, 'authorization': {'authorization_code': 'AUTH_fnbclbniv8', 'bin': '408408', 'last4': '4081', 'exp_month': '12', 'exp_year': '2030', 'channel': 'card', 'card_type': 'visa ', 'bank': 'TEST BANK', 'country_code': 'NG', 'brand': 'visa', 'reusable': True, 'signature': 'SIG_adt2hgEmuuUnc9Q7meke', 'account_name': None}, 'customer': {'id': 180436724, 'first_name': None, 'last_name': None, 'email': 'support@energiease.ng', 'customer_code': 'CUS_93lkipqjht7erme', 'phone': None, 'metadata': None, 'risk_action': 'default', 'international_format_phone': None}, 'plan': {}, 'subaccount': {}, 'split': {}, 'order_id': None, 'paidAt': '2024-08-15T13:38:20.000Z', 'requested_amount': 10000, 'pos_transaction_data': None, 'source': {'type': 'api', 'source': 'merchant_api', 'entry_point': 'transaction_initialize', 'identifier': None}}}
+
+
+
+app.server.utils.vtpass_utils - INFO - {'code': '000', 'content': {'transactions': {'status': 'pending', 'product_name': 'Jos Electric - JED', 'unique_element': '0101161031014', 'unit_price': 1000, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': 9, 'total_amount': 991, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 1000, 'platform': 'api', 'method': 'api', 'transactionId': '17260958016168828269914217'}}, 'response_description': 'TRANSACTION PROCESSING - PENDING', 'requestId': '202409120003b49b082e8a48', 'amount': '1000.00', 'transaction_date': {'date': '2024-09-11 23:03:21.000000', 'timezone_type': 2, 'timezone': 'Z'}, 'purchased_code': ''}
+
+
+{'code': '000', 'content': {'transactions': {'status': 'pending', 'product_name': 'Abuja Electricity Distribution Company- AEDC', 'unique_element': '04180283956', 'unit_price': 2000, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': 24, 'total_amount': 1976, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 2000, 'platform': 'api', 'method': 'api', 'transactionId': '17273790601681489713822385'}}, 'response_description': 'TRANSACTION PROCESSING - PENDING', 'requestId': '2024092620309a9ea89e6e1a', 'amount': '2000.00', 'transaction_date': {'date': '2024-09-26 19:31:00.000000', 'timezone_type': 2, 'timezone': 'Z'}, 'purchased_code': ''}
+
+ # {'object': 'whatsapp_business_account', 'entry': [{'id': '101864066083784', 'changes': [{'value': {'messaging_product': 'whatsapp', 'metadata': {'display_phone_number': '15550881730', 'phone_number_id': '100753659532289'}, 'contacts': [{'profile': {'name': 'Mind Colony LTD'}, 'wa_id': '2348102778677'}], 'messages': [{'context': {'from': '15550881730', 'id': 'wamid.HBgNMjM0ODEwMjc3ODY3NxUCABEYEkE3RDc0NkE3Q0FBMTNCQTEyQQA='}, 'from': '2348102778677', 'id': 'wamid.HBgNMjM0ODEwMjc3ODY3NxUCABIYIDdBMTlGRTA2QzM4OTg5RERDODU3OUVBODk3NDJEQUUyAA==', 'timestamp': '1726141993', 'type': 'interactive', 'interactive': {'type': 'button_reply', 'button_reply': {'id': 'buy_electricity', 'title': 'Buy Electricity ⚡'}}}]}, 'field': 'messages'}]}]}
+
+
+
+
+ {'code': '000', 'content': {'transactions': {'status': 'delivered', 'product_name': 'Abuja Electricity Distribution Company- AEDC', 'unique_element': '07162833334', 'unit_price': 3900, 'quantity': 1, 'service_verification': None, 'channel': 'api', 'commission': '46.80', 'total_amount': 3853.2, 'discount': None, 'type': 'Electricity Bill', 'email': 'musaadamuw@gmail.com', 'phone': '+2348135810804', 'name': None, 'convinience_fee': 0, 'amount': 3900, 'platform': 'api', 'method': 'api', 'transactionId': '17305017619314921235958456'}}, 'response_description': 'TRANSACTION SUCCESSFUL', 'requestId': '202411012355e9a7f1d3d782', 'amount': '3900.00', 'transaction_date': {'date': '2024-11-01 22:56:02.000000', 'timezone_type': 2, 'timezone': 'Z'}, 'purchased_code': 'Token : token: 67878617610674297422', 'MeterNumber': '07162833334', 'Token': 'token: 67878617610674297422', 'ReceiptNumber': '7002202411019248216', 'PurchasedUnits': 17.3, 'DebtDescription': None, 'DebtAmount': None, 'RefundUnits': None, 'ServiceChargeVatExcl': 3627.91, 'Name': 'E.D.(D&M) NEPA-HQ  ', 'Address': 'E.D.(D&M) NEPA-HQ   - PrepaidCommercial 1PH 3PH - Band A', 'Reference': '67878617610674297422', 'Vat': 272.09, 'ResponseTime': None, 'TariffRate': 'PrepaidCommercial 1PH 3PH - Band A', 'FreeUnits': None, 'MeterCategory': 'Kwh', 'UtilityAmountVatExcl': None}
+
+def format_token_with_dashes(token: str) -> str:
+    """Format a meter token by adding dashes every 4 characters.
+    
+    Args:
+        token (str): The raw meter token string
+        
+    Returns:
+        str: The formatted token with dashes (e.g. "1234-5678-9012-3456")
+    """
+    # Remove any existing spaces or dashes
+    clean_token = token.replace(" ", "").replace("-", "")
+    
+    # Split into groups of 4 and join with dashes
+    groups = [clean_token[i:i+4] for i in range(0, len(clean_token), 4)]
+    formatted_token = "-".join(groups)
+    
+    return formatted_token
+
+
+

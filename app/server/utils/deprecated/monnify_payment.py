@@ -2,7 +2,7 @@ import os
 import json
 import uuid6
 
-from app.server.utils.monnify_config import MonnifyCredential, Monnify
+from app.server.utils.deprecated.monnify_config import MonnifyCredential, Monnify
 
 reserve = Monnify()
 

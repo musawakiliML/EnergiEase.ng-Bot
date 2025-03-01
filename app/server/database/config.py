@@ -1,8 +1,8 @@
+import os
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Importing enviroment Variables
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -29,3 +29,7 @@ database = client.energiease_bot
 
 energiease_user_profile = database.get_collection("energiease_user_profiles")
 energiease_user_order = database.get_collection("energiease_user_orders")
+energiease_meter_details = database.get_collection("energiease_meter_details")
+energiease_user_details = database.get_collection("energiease_user_details")
+energiease_payment_details = database.get_collection("energiease_payment_details")
+energiease_session_details = database.get_collection("energiease_sessions_whatsapp")

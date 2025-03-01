@@ -36,14 +36,14 @@ def order_summary(owner: str, amount: str, meter_number: str, package: str, addr
     return message
 
 
-def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str):
-    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number:`{accountnumber}`\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n ⌛ Your request would be processed automatically once we received your payment."
+def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str, transaction_url: str | None):
+    message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number:`{accountnumber}`\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇: \n {transaction_url} \n\n ⌛ Your request would be processed automatically once we received your payment."
 
     return message
 
 
 def order_confirmation_message(order_id: str):
-    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id: {order_id}\n⌛ We are processing it."
+    message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id: `{order_id}`\n⌛ We are processing it."
 
     return message
 
@@ -55,7 +55,7 @@ def order_successful(meter_unit: str, meter_number: str, meter_token: str):
 
 
 def order_failed(order_id: str):
-    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support with your Order Id:{order_id}, or send email to support@energieasebot.ng."
+    message = f"OOPs ❌ Your order has failed!!\n Please Contact Support with your Order Id:`{order_id}`, or send email to support@energieasebot.ng.\nJust type '/start' 👋 To start a new conversation.. \nThank you for choosing EnergiEase!🤗"
     return message
 
 
@@ -65,9 +65,12 @@ def customer_support():
 
 
 def quit_chat():
-    message = "Thank You For the using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
+    message = "Thank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
     return message
 
+def cancel_order(order_id: str):
+    message = f"Your Order with ID:`{order_id}` has been cancelled ❌.\n\nThank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
+    return message
 
 def help_menu():
     message = "Welcome to Help Section of EnergiEase 🔋\nTo Buy Electricity Unit type /start\nTo End a chat session type /cancel\nTo Reach Customer type /support\nTo Get Help type /help"
