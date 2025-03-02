@@ -1,27 +1,27 @@
 """ VTPASS Connection for Buying Electricity """
-import os
+
 import json
+import os
+
 import requests
-
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
-VTPASS_STAGING_URL = os.environ['VTPASS_URL_STAGING']
-VTPASS_LIVE_URL = os.environ['VTPASS_URL_LIVE']
+VTPASS_STAGING_URL = os.environ["VTPASS_URL_STAGING"]
+VTPASS_LIVE_URL = os.environ["VTPASS_URL_LIVE"]
 
 # API Base urls for testing and live production
 
 
 class GetBaseUrl:
-    """ Generate a base URL for accessing information"""
+    """Generate a base URL for accessing information"""
 
     def __init__(self, live):
         self.live = live
 
     def urls(self):
-        """ Return a Base url either for live or for sandbox tests"""
+        """Return a Base url either for live or for sandbox tests"""
 
         if self.live is True:
             return VTPASS_LIVE_URL
@@ -29,17 +29,15 @@ class GetBaseUrl:
             return VTPASS_STAGING_URL
         else:
             # print(self.live)
-            return {
-                "message": "Live can either be True or False",
-                "status": False
-            }
+            return {"message": "Live can either be True or False", "status": False}
+
 
 # Functions to Perform operations on VTPASS
 
 
 class VTPASSCredentials:
     """
-       Generates credentials
+    Generates credentials
     """
 
     def __init__(self, api_key, public_key, secret_key, is_live):
@@ -60,7 +58,7 @@ class VTPASSCredentials:
 
 class VTPASS:
     """
-       Main Class for VTPASS Functions
+    Main Class for VTPASS Functions
     """
 
     def __init__(self) -> None:
@@ -82,18 +80,17 @@ class VTPASS:
                 url = f"{baseurl}/balance"
                 payload = {}
                 headers = {
-                    'api-key': credentials[0],
-                    'public-key': credentials[1],
-                    'Content-Type': 'application/json'
+                    "api-key": credentials[0],
+                    "public-key": credentials[1],
+                    "Content-Type": "application/json",
                 }
                 response = requests.request(
-                    'GET', url, headers=headers, data=json.dumps(payload), timeout=60)
+                    "GET", url, headers=headers, data=json.dumps(payload), timeout=60
+                )
                 response_dict = json.loads(response.text)
                 return response_dict
         except Exception as e:
-            return {
-                "message": str(e)
-            }
+            return {"message": str(e)}
 
     def verify_meter(self, billers_code, service_id, meter_type, credentials) -> dict:
         """Verifying the meter information
@@ -115,27 +112,32 @@ class VTPASS:
                 payload = {
                     "billersCode": billers_code,
                     "serviceID": service_id,
-                    "type": meter_type
+                    "type": meter_type,
                 }
                 headers = {
-                    'api-key': credentials[0],
-                    'secret-key': credentials[2],
-                    'Content-Type': 'application/json'
+                    "api-key": credentials[0],
+                    "secret-key": credentials[2],
+                    "Content-Type": "application/json",
                 }
                 response = requests.request(
-                    'POST', url, headers=headers, data=json.dumps(payload), timeout=60)
+                    "POST", url, headers=headers, data=json.dumps(payload), timeout=60
+                )
 
                 response_dict = json.loads(response.text)
                 return response_dict
         except Exception as e:
-            return {
-                "message": str(e)
-            }
+            return {"message": str(e)}
 
-    def purchase_electricity_unit(self, request_id: str,
-                                  service_id: str, billers_code: str,
-                                  variation_code: str, amount: int,
-                                  phone, credentials) -> dict:
+    def purchase_electricity_unit(
+        self,
+        request_id: str,
+        service_id: str,
+        billers_code: str,
+        variation_code: str,
+        amount: int,
+        phone,
+        credentials,
+    ) -> dict:
         """Buy Meter Electricity Unit for Given Meter Number
 
         Args:
@@ -161,22 +163,21 @@ class VTPASS:
                     "billersCode": billers_code,
                     "variation_code": variation_code,
                     "amount": amount,
-                    "phone": phone
+                    "phone": phone,
                 }
                 headers = {
-                    'api-key': credentials[0],
-                    'secret-key': credentials[2],
-                    'Content-Type': 'application/json'
+                    "api-key": credentials[0],
+                    "secret-key": credentials[2],
+                    "Content-Type": "application/json",
                 }
                 response = requests.request(
-                    'POST', url, headers=headers, data=json.dumps(payload), timeout=60)
+                    "POST", url, headers=headers, data=json.dumps(payload), timeout=60
+                )
 
                 response_dict = json.loads(response.text)
                 return response_dict
         except Exception as e:
-            return {
-                "message": str(e)
-            }
+            return {"message": str(e)}
 
     def transaction_status(self, request_id, credentials):
         """Get User Transactions Status
@@ -193,20 +194,17 @@ class VTPASS:
             if live is True or live is False:
                 baseurl = GetBaseUrl(live).urls()
                 url = f"{baseurl}/requery"
-                payload = {
-                    "request_id": request_id
-                }
+                payload = {"request_id": request_id}
                 headers = {
-                    'api-key': credentials[0],
-                    'secret-key': credentials[2],
-                    'Content-Type': 'application/json'
+                    "api-key": credentials[0],
+                    "secret-key": credentials[2],
+                    "Content-Type": "application/json",
                 }
                 response = requests.request(
-                    'POST', url, headers=headers, data=json.dumps(payload), timeout=60)
+                    "POST", url, headers=headers, data=json.dumps(payload), timeout=60
+                )
 
                 response_dict = json.loads(response.text)
                 return response_dict
         except Exception as e:
-            return {
-                "message": str(e)
-            }
+            return {"message": str(e)}

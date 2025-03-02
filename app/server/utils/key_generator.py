@@ -1,10 +1,12 @@
-
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
 import sys
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 if len(sys.argv) < 2:
-    raise ValueError("Passphrase is empty. Please include a passphrase argument to generate the keys like: python key_generator.py {passphrase}")
+    raise ValueError(
+        "Passphrase is empty. Please include a passphrase argument to generate the keys like: python key_generator.py {passphrase}"
+    )
 
 passphrase = sys.argv[1].encode("utf-8")
 
@@ -29,11 +31,17 @@ try:
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
 
-    print(f"Successfully created your public-private key pair. Please copy the below values into your .env file\n")
-    print("************* COPY PASSPHRASE & PRIVATE KEY BELOW TO .env FILE *************")
+    print(
+        "Successfully created your public-private key pair. Please copy the below values into your .env file\n"
+    )
+    print(
+        "************* COPY PASSPHRASE & PRIVATE KEY BELOW TO .env FILE *************"
+    )
     print(f"PASSPHRASE=\"{passphrase.decode('utf-8')}\"\n")
     print(f"PRIVATE_KEY=\"{private_key_pem.decode('utf-8')}\"\n")
-    print("************* COPY PASSPHRASE & PRIVATE KEY ABOVE TO .env FILE *************\n")
+    print(
+        "************* COPY PASSPHRASE & PRIVATE KEY ABOVE TO .env FILE *************\n"
+    )
     print("************* COPY PUBLIC KEY BELOW *************")
     print(public_key_pem.decode("utf-8"))
     print("************* COPY PUBLIC KEY ABOVE *************")

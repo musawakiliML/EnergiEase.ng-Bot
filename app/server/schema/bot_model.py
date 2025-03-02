@@ -1,10 +1,12 @@
-from typing import Optional, Union, List
 from datetime import datetime
+from typing import Union
+
 from pydantic import BaseModel, Field
 
 
 class UserProfileSchema(BaseModel):
-    ''' Creating a User Profile Model'''
+    """Creating a User Profile Model"""
+
     # id: str = Field(..., alias="_id")
     username: str = Field(...)
     full_name: str = Field(...)
@@ -18,13 +20,14 @@ class UserProfileSchema(BaseModel):
                 "username": "johndoe",
                 "full_name": "John Doe",
                 "user_id": 936591022,
-                "created_at": str(datetime.now())
+                "created_at": str(datetime.now()),
             }
         }
 
 
 class OrdersSchema(BaseModel):
-    '''Creating an Order Model'''
+    """Creating an Order Model"""
+
     # id: str = Field(..., alias="_id")
     # List[Optional[str]] = [None]
     # Union[str, None]
@@ -62,13 +65,14 @@ class OrdersSchema(BaseModel):
                 "transaction_id": "",
                 "transaction_reference": "",
                 "order_status": "",
-                "created_at": str(datetime.now())
+                "created_at": str(datetime.now()),
             }
         }
 
 
 class UserSessionSchema(BaseModel):
-    '''Creating an Order Model'''
+    """Creating an Order Model"""
+
     # id: str = Field(..., alias="_id")
     # List[Optional[str]] = [None]
     # Union[str, None]
@@ -116,13 +120,14 @@ class UserSessionSchema(BaseModel):
                 "transaction_id": "",
                 "transaction_reference": "",
                 "order_status": "",
-                "created_at": str(datetime.now())
+                "created_at": str(datetime.now()),
             }
         }
 
 
 class MeterDetailsSchema(BaseModel):
-    '''Creating a Meter Details Model'''
+    """Creating a Meter Details Model"""
+
     meter_owner: str | None
     meter_number: str | None
     meter_address: str | None
@@ -138,6 +143,6 @@ class MeterDetailsSchema(BaseModel):
                 "meter_address": "No 123, Lagos, Nigeria",
                 "meter_package": "Prepaid",
                 "meter_distributions": "AEDC",
-                "meter_code": "abuja-electric"
+                "meter_code": "abuja-electric",
             }
         }

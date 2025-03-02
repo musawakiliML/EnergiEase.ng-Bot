@@ -1,10 +1,11 @@
-from typing import Optional, Union, List
 from datetime import datetime
-from pydantic import BaseModel, Field, EmailStr
+from typing import Union
+
+from pydantic import BaseModel, EmailStr
 
 
 class UserSchema(BaseModel):
-    """ User Model
+    """User Model
 
     Args:
         BaseModel (_type_): _description_
@@ -46,10 +47,7 @@ class UserLoginSchema(BaseModel):
 
     class Config:
         json_schema_extra = {
-            "example": {
-                "email_address": "johndoe@example",
-                "password": "password"
-            }
+            "example": {"email_address": "johndoe@example", "password": "password"}
         }
 
 
@@ -58,12 +56,7 @@ class UserToken(BaseModel):
     token_type: str
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "access_token": "",
-                "token_type": ""
-            }
-        }
+        json_schema_extra = {"example": {"access_token": "", "token_type": ""}}
 
 
 class UserUpdateSchema(BaseModel):
@@ -111,6 +104,6 @@ class AdminUserSchema(BaseModel):
                 "password": "password",
                 "role": "admin",
                 "created_at": str(datetime.now()),
-                "updated_at": str(datetime.now())
+                "updated_at": str(datetime.now()),
             }
         }

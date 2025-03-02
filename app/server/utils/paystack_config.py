@@ -1,20 +1,21 @@
 import json
+
 import requests
 
 # API Base urls for testing and live production
 
+
 class GetBaseUrl:
-    """Get Base URL
-    """
+    """Get Base URL"""
 
     def __init__(self, live):
         self.live = live
 
     def urls(self):
         if self.live is True:
-            return 'https://api.paystack.co'
+            return "https://api.paystack.co"
         else:
-            return 'live can either be True or False'
+            return "live can either be True or False"
 
 
 class PaystackCredential:
@@ -33,15 +34,13 @@ class Paystack:
     def __init__(self):
         pass
 
-    def create_customer(self, credentials,
-                        first_name,
-                        last_name, email) -> dict: 
+    def create_customer(self, credentials, first_name, last_name, email):
         try:
             key = credentials[0]
             live = credentials[1]
-            if live == True:
+            if live:
                 baseurl = GetBaseUrl(live).urls()
-                url = f'{baseurl}/customer'
+                url = f"{baseurl}/customer"
 
                 payload = {
                     "first_name": first_name,
@@ -50,101 +49,93 @@ class Paystack:
                     #   "phone": "+2348177777779"
                 }
                 headers = {
-                    'Content-Type': 'application/json',
-                    "Authorization": f"Bearer {key}"
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {key}",
                 }
 
                 response = requests.request(
-                    "POST", url, headers=headers, data=json.dumps(payload))
+                    "POST", url, headers=headers, data=json.dumps(payload)
+                )
 
                 r_dict = json.loads(response.text)
                 return r_dict
         except Exception as e:
             return {"message": str(e)}
 
-    def create_dedicated_account(self, credentials,
-                                 customer
-                                 ) -> dict:
+    def create_dedicated_account(self, credentials, customer):
         try:
             key = credentials[0]
             live = credentials[1]
-            if live == True:
+            if live:
                 baseurl = GetBaseUrl(live).urls()
-                url = f'{baseurl}/dedicated_account'
+                url = f"{baseurl}/dedicated_account"
 
-                payload = {
-                    "customer": customer
-                }
+                payload = {"customer": customer}
                 headers = {
-                    'Content-Type': 'application/json',
-                    "Authorization": f"Bearer {key}"
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {key}",
                 }
 
                 response = requests.request(
-                    "POST", url, headers=headers, data=json.dumps(payload))
+                    "POST", url, headers=headers, data=json.dumps(payload)
+                )
 
                 r_dict = json.loads(response.text)
                 return r_dict
         except Exception as e:
             return {"message": str(e)}
 
-    def create_transaction(self, credentials,
-                           email, amount,
-                           payment_reference
-                           ) -> dict:
+    def create_transaction(self, credentials, email, amount, payment_reference):
         try:
             key = credentials[0]
             live = credentials[1]
-            if live == True:
+            if live:
                 baseurl = GetBaseUrl(live).urls()
-                url = f'{baseurl}/transaction/initialize'
+                url = f"{baseurl}/transaction/initialize"
 
                 payload = {
                     "email": email,
                     "amount": amount,
                     "reference": payment_reference,
-                    "channels": ["card", "ussd", "bank_transfer"]
+                    "channels": ["card", "ussd", "bank_transfer"],
                 }
                 headers = {
-                    'Content-Type': 'application/json',
-                    "Authorization": f"Bearer {key}"
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {key}",
                 }
 
                 response = requests.request(
-                    "POST", url, headers=headers, data=json.dumps(payload))
+                    "POST", url, headers=headers, data=json.dumps(payload)
+                )
 
                 r_dict = json.loads(response.text)
                 return r_dict
         except Exception as e:
             return {"message": str(e)}
 
-    def create_charge(self, credentials,
-                      email, amount,
-                      payment_reference
-                      ) -> dict:
+    def create_charge(self, credentials, email, amount, payment_reference):
         try:
             key = credentials[0]
             # print(key)
             live = credentials[1]
-            if live == True:
+            if live:
                 baseurl = GetBaseUrl(live).urls()
-                url = f'{baseurl}/charge'
+                url = f"{baseurl}/charge"
 
                 payload = {
                     "email": email,
                     "amount": amount,
                     "reference": payment_reference,
-                    "bank_transfer": {
-                        "account_expires_at":"2024-06-08T12:10:00Z"
-                    }
+                    "bank_transfer": {"account_expires_at": "2024-06-08T12:10:00Z"},
                 }
                 headers = {
-                    'Content-Type': 'application/json',
-                    'Authorization': f"Bearer {key}"
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {key}",
                 }
 
                 response = requests.request(
-                    "POST", url, headers=headers, data=json.dumps(payload))
+                    "POST", url, headers=headers, data=json.dumps(payload)
+                )
 
                 r_dict = json.loads(response.text)
                 return r_dict
@@ -167,4 +158,3 @@ class Paystack:
 #                                   amount="100",
 #                                   payment_reference=payment_reference
 #                                   )
-

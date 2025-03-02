@@ -107,7 +107,9 @@ async def verify_payment_buy_unit(
                 )
                 message = order_confirmation(order_id=order_id)
 
-                send_whatsapp_message_normal(user_phone_number["user_phone_number"], message)
+                send_whatsapp_message_normal(
+                    user_phone_number["user_phone_number"], message
+                )
             else:
                 # Send Order Confirmation Message telegram
                 user_id = get_order_details["user_profile"]["user_id"]  # type: ignore
@@ -242,7 +244,9 @@ async def verify_payment_buy_unit(
                     get_order_details["session_id"]
                 )
                 message = order_failed_whatsapp(order_id=order_id)
-                send_whatsapp_message_normal(user_phone_number["user_phone_number"], message)
+                send_whatsapp_message_normal(
+                    user_phone_number["user_phone_number"], message
+                )
             else:
 
                 # Send Order Failed Message on Telegram

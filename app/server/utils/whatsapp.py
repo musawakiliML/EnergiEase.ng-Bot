@@ -8,6 +8,7 @@ load_dotenv()
 
 # Twilio Message Handler
 
+
 def send_whatsapp_message(recipient_number: str, body: str):
 
     account_sid = os.environ["TWILIO_ACCOUNT_SID"]
@@ -84,6 +85,7 @@ def send_whatsapp_message_opening_buttons(phone_number, name):
 
 # Send Disco List Plans
 
+
 def send_disco_list_message(phone_number: str) -> dict:
 
     headers = {
@@ -99,7 +101,9 @@ def send_disco_list_message(phone_number: str) -> dict:
         "interactive": {
             "type": "list",
             "header": {"type": "text", "text": "Discos List"},
-            "body": {"text": "That's perfect!! 👍 Choose from the Distribution Companies available below:"},
+            "body": {
+                "text": "That's perfect!! 👍 Choose from the Distribution Companies available below:"
+            },
             "footer": {"text": "Powered By Mind Colony™"},
             "action": {
                 "button": "Select Disco",
@@ -116,7 +120,7 @@ def send_disco_list_message(phone_number: str) -> dict:
                                 "title": "EEDC",
                             },
                             {
-                               "id": "ekedc",
+                                "id": "ekedc",
                                 "title": "EKEDC",
                             },
                             {
@@ -154,12 +158,13 @@ def send_disco_list_message(phone_number: str) -> dict:
         },
     }
 
-    response = requests.post(
-        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
 
+
 # Send meter type buttons
+
 
 def send_meter_type_buttons(phone_number):
     headers = {"Authorization": os.environ["WHATSAPP_TOKEN"]}
@@ -171,9 +176,7 @@ def send_meter_type_buttons(phone_number):
         "interactive": {
             "type": "button",
             "header": {"type": "text", "text": "Meter Type"},
-            "body": {
-                "text": "Please Select Your Meter Type:"
-            },
+            "body": {"text": "Please Select Your Meter Type:"},
             "footer": {"text": "Powered By Mind Colony™"},
             "action": {
                 "buttons": [
@@ -187,7 +190,7 @@ def send_meter_type_buttons(phone_number):
                             "id": "postpaid",
                             "title": "Postpaid",
                         },
-                    }
+                    },
                 ]
             },
         },
@@ -230,10 +233,10 @@ def send_confirm_order_message(phone_number: str, body_text: str) -> dict:
         },
     }
 
-    response = requests.post(
-        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
+
 
 # Send Payment Link and Payment Details
 def send_call_to_action_payment_whatsapp(
@@ -260,7 +263,6 @@ def send_call_to_action_payment_whatsapp(
             },
         },
     }
-    response = requests.post(
-        os.environ["WHATSAPP_URL"], headers=headers, json=payload)
+    response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
     return response_json
