@@ -76,7 +76,7 @@ if os.environ["DEBUG"] == "True":
         "https://living-optimal-seahorse.ngrok-free.app" + WEBHOOK_PATH
     )
 elif os.environ["DEBUG"] == "False":
-    WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot.onrender.com" + WEBHOOK_PATH
+    WEBHOOK_URL_PRODUCTION = "https://energiease-ng-bot-jgpr.onrender.com" + WEBHOOK_PATH
     # WEBHOOK_URL_PRODUCTION_VERCEL = "https://energi-ease-ng-bot.vercel.app" + WEBHOOK_PATH
 
 
@@ -137,7 +137,7 @@ application.add_handler(customer_support)
 
 
 # Render Background Tasks
-RENDER_URL = "https://energiease-ng-bot.onrender.com/"
+RENDER_URL = "https://energiease-ng-bot-jgpr.onrender.com/"
 RELOAD_INTERVAL = 600  # Interval in seconds (15 minutes)
 
 
