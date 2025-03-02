@@ -80,6 +80,7 @@ def send_whatsapp_message_opening_buttons(phone_number, name):
     }
     response = requests.post(os.environ["WHATSAPP_URL"], headers=headers, json=payload)
     response_json = response.json()
+    print(response_json)
     return response_json
 
 
