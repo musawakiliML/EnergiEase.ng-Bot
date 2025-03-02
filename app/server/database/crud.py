@@ -60,7 +60,7 @@ async def get_single_order_transaction(transaction_reference: str):
 async def update_user_order(user_order_data: list, session_id: str):
     """Update Single User Order"""
     try:
-        update_user_order = await energiease_user_order.update_one(
+        await energiease_user_order.update_one(
             {"session_id": session_id},
             {"$set": {user_order_data[0]: user_order_data[1]}},
         )
@@ -82,7 +82,7 @@ async def update_user_order(user_order_data: list, session_id: str):
 async def update_user_order_transaction(user_order_data: list, transaction_id: str):
     """Update Single User Order"""
     try:
-        update_user_order = await energiease_user_order.update_one(
+        await energiease_user_order.update_one(
             {"transaction_id": transaction_id},
             {"$set": {user_order_data[0]: user_order_data[1]}},
         )
@@ -276,7 +276,7 @@ async def get_user_by_email(email: str):
 # Update User ID
 async def update_user_by_id(id: str, user_data: dict):
     try:
-        update_user_data = await energiease_user_details.update_one(
+        await energiease_user_details.update_one(
             {"_id": ObjectId(id)}, {"$set": user_data}
         )
         updated_user_data = await energiease_user_details.find_one(
@@ -412,7 +412,7 @@ async def create_single_meter_details(meter_details_data: dict):
 async def update_meter_details(meter_detail_data: list, meter_number: str):
     """Update Meter Details"""
     try:
-        update_meter_details_data = await energiease_meter_details.update_one(
+        await energiease_meter_details.update_one(
             {"meter_number": meter_number},
             {"$set": {meter_detail_data[0]: meter_detail_data[1]}},
         )

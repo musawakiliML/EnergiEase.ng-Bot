@@ -30,13 +30,21 @@ def bill_amount_menu():
     return message
 
 
-def order_summary(owner: str, amount: str, meter_number: str, package: str, address: str):
+def order_summary(
+    owner: str, amount: str, meter_number: str, package: str, address: str
+):
     message = f"Hurray!, Here is your order summary:\n\n\t👤 Meter Owner:{owner}\n\t🔢 Meter No:`{meter_number}`\n\t📍 Address: {address}\n\t📦 Package: {package}\n\n\t💵 Amount {emojize(':dollar:', language='alias')}: ₦ {amount}\n\tService Fee: ₦ 100\n\nChoose an option:"
 
     return message
 
 
-def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str, transaction_url: str | None):
+def order_payment(
+    amount: str,
+    accountnumber: str,
+    accountname: str,
+    bankname: str,
+    transaction_url: str | None,
+):
     message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number:`{accountnumber}`\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇: \n {transaction_url} \n\n ⌛ Your request would be processed automatically once we received your payment."
 
     return message
@@ -60,7 +68,9 @@ def order_failed(order_id: str):
 
 
 def customer_support():
-    message = f"Welcome to Customer Support. Please Whats your issue Today? Write to us.."
+    message = (
+        "Welcome to Customer Support. Please Whats your issue Today? Write to us.."
+    )
     return message
 
 
@@ -68,9 +78,11 @@ def quit_chat():
     message = "Thank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
     return message
 
+
 def cancel_order(order_id: str):
     message = f"Your Order with ID:`{order_id}` has been cancelled ❌.\n\nThank You For using the Bot 🤗, See you next time 👋.\n Just type '/start' 👋 To start a conversation."
     return message
+
 
 def help_menu():
     message = "Welcome to Help Section of EnergiEase 🔋\nTo Buy Electricity Unit type /start\nTo End a chat session type /cancel\nTo Reach Customer type /support\nTo Get Help type /help"

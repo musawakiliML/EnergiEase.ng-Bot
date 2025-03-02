@@ -1,7 +1,7 @@
 import bcrypt
 
-
 # Create Hash function
+
 
 class HashPassword:
     def create_hash(self, password: str):

@@ -1,17 +1,17 @@
 def user_profile_serializer(input_data: dict) -> dict:
-    ''' User Profile Serializer'''
+    """User Profile Serializer"""
 
     return {
         "_id": str(input_data["_id"]),
         "username": input_data["username"],
         "full_name": input_data["full_name"],
         "user_id": input_data["user_id"],
-        "created_at": str(input_data["created_at"])
+        "created_at": str(input_data["created_at"]),
     }
 
 
 def order_serializer(input_data: dict) -> dict:
-    ''' Order Serializer '''
+    """Order Serializer"""
 
     return {
         "_id": str(input_data["_id"]),
@@ -31,13 +31,12 @@ def order_serializer(input_data: dict) -> dict:
         "transaction_id": input_data["transaction_id"],
         "transaction_reference": input_data["transaction_reference"],
         "order_status": input_data["order_status"],
-        "created_at": str(input_data["created_at"])
-
+        "created_at": str(input_data["created_at"]),
     }
 
 
 def user_session_serializer(input_data: dict):
-    ''' User Session Serializer '''
+    """User Session Serializer"""
 
     return {
         "_id": str(input_data["_id"]),
@@ -62,13 +61,12 @@ def user_session_serializer(input_data: dict):
         "transaction_id": input_data["transaction_id"],
         "transaction_reference": input_data["transaction_reference"],
         "order_status": input_data["order_status"],
-        "created_at": str(input_data["created_at"])
-
+        "created_at": str(input_data["created_at"]),
     }
 
 
 def meter_details_serializer(input_data: dict) -> dict:
-    '''Meter Details Serializer'''
+    """Meter Details Serializer"""
 
     return {
         "meter_owner": input_data["meter_owner"],
@@ -76,12 +74,12 @@ def meter_details_serializer(input_data: dict) -> dict:
         "meter_address": input_data["meter_address"],
         "meter_package": input_data["meter_package"],
         "meter_distributions": input_data["meter_distributions"],
-        "meter_code": input_data["meter_code"]
+        "meter_code": input_data["meter_code"],
     }
 
 
 def user_details_serializer(input_data: dict):
-    '''User Details Serializer'''
+    """User Details Serializer"""
 
     return {
         "first_name": input_data["first_name"],
@@ -94,12 +92,12 @@ def user_details_serializer(input_data: dict):
         "location": input_data["location"],
         "profile_pic": input_data["profile_pic"],
         "created_at": input_data["created_at"],
-        "updated_at": input_data["updated_at"]
+        "updated_at": input_data["updated_at"],
     }
 
 
 def admin_details_serializer(input_data: dict):
-    ''' Admin User Details Serializer'''
+    """Admin User Details Serializer"""
 
     return {
         "username": input_data["username"],
@@ -107,5 +105,5 @@ def admin_details_serializer(input_data: dict):
         "password": input_data["password"],
         "role": input_data["role"],
         "created_at": input_data["created_at"],
-        "updated_at": input_data["updated_at"]
+        "updated_at": input_data["updated_at"],
     }

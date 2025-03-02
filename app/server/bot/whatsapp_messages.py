@@ -29,28 +29,41 @@ def bill_amount_menu():
     return message
 
 
-def order_summary(owner: str, amount: str, meter_number: str, package: str, address: str):
+def order_summary(
+    owner: str, amount: str, meter_number: str, package: str, address: str
+):
     message = f"Hurray!, Here is your order summary:\n\n\t👤 Meter Owner:{owner}\n\t🔢 Meter No: {meter_number}\n\t📍 Address: {address}\n\t📦 Package: {package}\n\n\t💵 Amount {emojize(':dollar:', language='alias')}: ₦ {amount}\n\tService Fee: ₦ 100\n\n{emojize(':one:', language='alias')} Confirm Order ✔️ \n\n{emojize(':two:', language='alias')} Cancel Order ❌ \n\n To Confirm order please reply with 1."
 
     return message
 
 
-def order_summary_updated(owner: str, amount: str, meter_number: str, package: str, address: str):
+def order_summary_updated(
+    owner: str, amount: str, meter_number: str, package: str, address: str
+):
     message = f"\t👤 Meter Owner:{owner}\n\t🔢 Meter No: {meter_number}\n\t📍 Address: {address}\n\t📦 Package: {package}\n\n\t💵 Amount {emojize(':dollar:', language='alias')}: ₦ {amount}\n\tService Fee: ₦ 100. Click the button to continue.."
 
     return message
 
 
-def order_payment(amount: str, accountnumber: str, accountname: str, bankname: str, transaction_url: str | None):
+def order_payment(
+    amount: str,
+    accountnumber: str,
+    accountname: str,
+    bankname: str,
+    transaction_url: str | None,
+):
     message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number: {accountnumber}\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇: \n {transaction_url} \n\n ⌛ Your request would be processed automatically once we received your payment.\n\n To Cancel Order Reply with 'Q'"
 
     return message
 
 
-def order_payment_updated(amount: str, accountnumber: str, accountname: str, bankname: str):
+def order_payment_updated(
+    amount: str, accountnumber: str, accountname: str, bankname: str
+):
     message = f"Fabulous!! Please send 💵 {int(amount) + 100} to:\n\n\tAccount number: {accountnumber}\n\tAccount name: {accountname}\n\tBank name: {bankname}\n\n\tAccount Number Expires In: 30mins\n\n You can also Pay Using Paystack. Just Click the Link Below 👇\n\n ⌛ Your request would be processed automatically once we received your payment.\n\n To Cancel Order Reply with 'Q'"
 
     return message
+
 
 def order_confirmation(order_id: str):
     message = f"Fantastic!! Your order has been received.✅\n\n\tOrder Id:*{order_id}*\n⌛ We are processing it."

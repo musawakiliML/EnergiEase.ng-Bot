@@ -1,10 +1,10 @@
-""" Utilities for VTPASS Activities """
-import os
-import pytz
 import logging
-from uuid6 import uuid7
+import os
 from datetime import datetime
+
+import pytz
 from dotenv import load_dotenv
+from uuid6 import uuid7
 
 from app.server.utils.vtpass import VTPASS, VTPASSCredentials
 
@@ -20,12 +20,11 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-api_key = os.environ['VTPASS_API_KEY_LIVE']
-public_key = os.environ['VTPASS_PUBLIC_KEY_LIVE']
-secret_key = os.environ['VTPASS_SECRET_KEY_LIVE']
+api_key = os.environ["VTPASS_API_KEY_LIVE"]
+public_key = os.environ["VTPASS_PUBLIC_KEY_LIVE"]
+secret_key = os.environ["VTPASS_SECRET_KEY_LIVE"]
 
-vtpass_credentials = VTPASSCredentials(
-    api_key, public_key, secret_key, is_live=True)
+vtpass_credentials = VTPASSCredentials(api_key, public_key, secret_key, is_live=True)
 
 credentials = vtpass_credentials.credentials()
 
@@ -33,18 +32,21 @@ vtpass = VTPASS()
 
 # Generate Reference ID for VTPASS
 
+
 def generated_request_id():
-    lagos_timezone = pytz.timezone('Africa/Lagos')
-    date_time_id = datetime.now(lagos_timezone).strftime('%Y%m%d%H%M')
+    lagos_timezone = pytz.timezone("Africa/Lagos")
+    date_time_id = datetime.now(lagos_timezone).strftime("%Y%m%d%H%M")
     reference_id = str(uuid7()).split("-")[4]
     return date_time_id + reference_id
+
 
 # print(generated_request_id())
 
 # Extract Token From VTPASS Purchase
 
+
 def get_token_units(electricity_response, product):
-    """ Get Electricity Token and Units from VTPASS Purchase
+    """Get Electricity Token and Units from VTPASS Purchase
 
     Args:
         electricity_response (dict): VTPASS Response object
@@ -57,14 +59,13 @@ def get_token_units(electricity_response, product):
         dict: Token and Units
     """
     try:
-        tokens = str(
-            electricity_response["purchased_code"].split(':')[1]).strip()
-        
-        unit_code = ['Units','PurchasedUnits','units','mainTokenUnits']
-        
+        tokens = str(electricity_response["purchased_code"].split(":")[1]).strip()
+
+        unit_code = ["Units", "PurchasedUnits", "units", "mainTokenUnits"]
+
         for unit in unit_code:
             units_value = electricity_response.get(unit, "None")
-            
+
             if units_value != "None":
                 units = units_value
                 break
@@ -76,11 +77,12 @@ def get_token_units(electricity_response, product):
         #     units = electricity_response['mainTokenUnits']
         # elif product == "IBEDCO" or product == "JED":
         #     units = electricity_response['Units']
-        
+
         # return units and tokens
-        return {'tokens': tokens, 'units': units}
+        return {"tokens": tokens, "units": units}
     except Exception as e:
         raise Exception({"message": str(e)})
+
 
 def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
     """Get Meter Details VTPASS
@@ -98,7 +100,7 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
             credentials=credentials,
             billers_code=meter_number,
             service_id=disco,
-            meter_type=meter_type
+            meter_type=meter_type,
         )
 
         # logger.info(f"{meter_details}")
@@ -107,26 +109,20 @@ def get_meter_details_vtpass(meter_number, disco, meter_type) -> dict:
         # logger.info(f"{response}")
         if response == "000":
             user_meter_detail = {
-                "meter_name": meter_details['content']["Customer_Name"],
-                "meter_address": meter_details['content']["Address"],
-                "status": "200"
+                "meter_name": meter_details["content"]["Customer_Name"],
+                "meter_address": meter_details["content"]["Address"],
+                "status": "200",
             }
             return user_meter_detail
         else:
-            return {
-                "status": "400",
-                "message": "Error Occured!"
-            }
+            return {"status": "400", "message": "Error Occured!"}
     except Exception as e:
-        return {
-            "status": "400",
-            "message": "Error Occured!",
-            "errors": str(e)
-        }
+        return {"status": "400", "message": "Error Occured!", "errors": str(e)}
+
 
 # Buy Meter Unit
 def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
-    '''Buy Meter units'''
+    """Buy Meter units"""
     try:
         request_id = generated_request_id()
         user_meter_unit = vtpass.purchase_electricity_unit(
@@ -136,11 +132,11 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
             billers_code=meter_number,
             variation_code=meter_type,
             amount=amount,
-            phone="08102778677"
+            phone="08102778677",
         )
-        
+
         logger.info(f"{user_meter_unit}")
-        
+
         response_status = user_meter_unit.get("code")
         if response_status == "000":
             if disco == "eko-electric":
@@ -167,26 +163,23 @@ def buy_meter_unit_vtpass(meter_number, disco, amount, meter_type) -> dict:
                 product = "ABA"
             elif disco == "yola-electric":
                 product = "YEDC"
-            
+
             token_units = get_token_units(user_meter_unit, product)
             user_meter_unit_details = {
                 "meter_token": token_units["tokens"],
                 "meter_units": token_units["units"],
-                "status": "200"
+                "status": "200",
             }
             logger.info(f"{user_meter_unit_details}")
 
             return user_meter_unit_details
         else:
-            return {
-                "status": "400",
-                "message": "Error Occured!"
-            }
+            return {"status": "400", "message": "Error Occured!"}
     except Exception as e:
         return {
             "status": str(response_status),
             "message": "Error Occured!",
-            "errors": str(e)
+            "errors": str(e),
         }
 
 
