@@ -624,6 +624,15 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
                     message = "Oops 😓 Please Enter a Number:"
                     send_whatsapp_message_normal(phonenumber, message)
     else:
-        if text in opening:
-            update_data = ["entry_message", text]
-            await update_user_session(update_data, phoneid)
+        
+        if text in quit_inputs:
+
+            send_whatsapp_message_normal(phone_number=phonenumber, message=quit_chat())
+
+            await delete_user_session(phoneid)
+
+        elif text in ["hi", "Hi", "Hello", "hello", "Hey", "hey", "start", "Start"]:
+                    
+            send_whatsapp_message_opening_buttons(phonenumber, profilename)
+                    
+            await update_user_session(["entry_message", text], phoneid)
