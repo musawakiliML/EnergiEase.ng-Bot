@@ -109,17 +109,19 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
         except Exception as e:
             print(f"Exception in Creating User Session: {str(e)}")
 
-        # Bot Coversations
-        opening = ["hi", "Hi", "Hello", "Hello", "Hey", "hey", "start", "Start"]
-        # opening_msg = random.choice(opening).upper()
+        # # Bot Coversations
+        # opening = ["hi", "Hi", "Hello", "Hello", "Hey", "hey", "start", "Start"]
+        # # opening_msg = random.choice(opening).upper()
 
-        # Check user input and send opening message
-        if text in opening:
+        # # Check user input and send opening message
+        # if text in opening:
 
-            send_whatsapp_message_opening_buttons(phonenumber, profilename)
-        else:
-            message = f"Hey {profilename}, I'm a Bot To help you buy electricity unit, Just type 'Hi, Hey, or Hello' to start."
-            send_whatsapp_message_normal(phonenumber, message)
+        #     send_whatsapp_message_opening_buttons(phonenumber, profilename)
+            
+        # else:
+            
+        #     message = f"Hey {profilename}, I'm a Bot To help you buy electricity unit, Just type 'Hi, Hey, or Hello' to start."
+        #     send_whatsapp_message_normal(phonenumber, message)
 
     quit_inputs = ["q", "Q", "Quit", "quit", "QUIT"]
 
@@ -636,3 +638,7 @@ async def handle_whatsapp_chat(phonenumber, text, profilename, phoneid):
             send_whatsapp_message_opening_buttons(phonenumber, profilename)
                     
             await update_user_session(["entry_message", text], phoneid)
+        else:
+            # Return a message to the user based on this input
+            message = f"Hey {profilename}, I'm a Bot To help you buy electricity unit, Just type 'Hi, Hey, or Hello' to start."
+            send_whatsapp_message_normal(phonenumber, message)
